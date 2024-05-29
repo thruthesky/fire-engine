@@ -2,7 +2,7 @@
 # https://firebase.google.com/docs/extensions/reference/extension-yaml
 
 # Identifier for your extension
-name: cloud-functions-fireflutter-backend
+name: fff
 version: 0.0.1  # Follow semver versioning
 specVersion: v1beta  # Version of the Firebase Extensions specification
 
@@ -10,8 +10,8 @@ specVersion: v1beta  # Version of the Firebase Extensions specification
 displayName: Cloud Functions for FireFlutter
 
 author:
-  name: JaeHo Song
-  email: thruthesky@gmail.com
+  authorName: JaeHo Song
+  url: https://github.com/thruthesky
 
 # Brief description of the task your extension performs (~1 sentence)
 description: >-
@@ -35,7 +35,13 @@ billingRequired: true
 # In a `roles` field, list any IAM access roles required for your extension to operate.
 # Learn more in the docs:
 # https://firebase.google.com/docs/extensions/reference/extension-yaml#roles-field
-
+roles:
+  - role: firebasedatabase.admin
+    reason: Allows the extension to read and write to the Firebase Realtime Database.
+  # - role: firebaseauth.admin
+  #   reason: Allows the extension to update the user custom claims in Firebase Auth.
+  # - role: datastore.owner
+  #   reason: Allows the extension to update the response of the command execution to Firestore.
 # In the `resources` field, list each of your extension's functions, including the trigger for each function.
 # Learn more in the docs:
 # https://firebase.google.com/docs/extensions/reference/extension-yaml#resources-field
@@ -54,13 +60,13 @@ resources:
 # In the `params` field, set up your extension's user-configured parameters.
 # Learn more in the docs:
 # https://firebase.google.com/docs/extensions/reference/extension-yaml#params-field
-params:
-  - param: GREETING
-    label: Greeting for the world
-    description: >-
-      What do you want to say to the world?
-      For example, Hello world? or What's up, world?
-    type: string
-    default: Hello
-    required: true
-    immutable: false
+# params:
+#   - param: GREETING
+#     label: Greeting for the world
+#     description: >-
+#       What do you want to say to the world?
+#       For example, Hello world? or What's up, world?
+#     type: string
+#     default: Hello
+#     required: true
+#     immutable: false

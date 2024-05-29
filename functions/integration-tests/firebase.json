@@ -9,6 +9,6 @@
     "singleProjectMode": true
   },
   "extensions": {
-    "cloud-functions-fireflutter-backend": "../.."
+    "fff": "../.."
   }
 }
