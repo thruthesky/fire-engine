@@ -10,7 +10,7 @@ Learn more about writing a POSTINSTALL.md file in the docs:
 https://firebase.google.com/docs/extensions/publishers/user-documentation#writing-postinstall
 -->
 
-# See it in action
+# Cloud Functions for FireFlutter
 
 You can test out this extension right away!
 
