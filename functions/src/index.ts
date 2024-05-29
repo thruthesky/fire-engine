@@ -14,7 +14,7 @@ import * as admin from "firebase-admin";
 
 admin.initializeApp();
 
-export * from "./user.functions";
+export * from "./user/user.functions";
 
 
 exports.greetTheWorld = functions.https.onRequest(

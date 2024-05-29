@@ -1,0 +1,18 @@
+// const functions = require('firebase-functions');
+// const admin = require('firebase-admin');
+// import * as admin from "firebase-admin";
+// import * as logger from "firebase-functions/logger";
+// import { getDatabase } from "firebase-admin/database";
+import * as functions from "firebase-functions";
+import { Config } from "../config";
+import { isUpdate } from "../library";
+
+export const postSummariesOnPostWrite = functions.database.ref(`${Config.posts}/{category}/{postId}`)
+    .onWrite(async (change: functions.Change<functions.database.DataSnapshot>, context: functions.EventContext<{
+        category: string;
+        postId: string;
+    }>) => {
+        if (isUpdate(change)) {
+            return;
+        }
+    });
