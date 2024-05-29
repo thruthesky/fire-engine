@@ -2,7 +2,7 @@ import "mocha";
 
 // src/index.ts 를 가져오면 default Firebase app already exists 에러가 발생한다.
 // 왜냐하면 src/index.ts 에서 다른 함수들을 export 하기도 하지만, 최상위 레벨에서 초기화를 하기 때문이다.
-import { userUpdate } from "../../src/user.functions";
+import { userUpdate } from "../../src/user/user.functions";
 
 // 여기서 initializeFirebaseOnce() 함수를 한번만 호출하여 Firebase 앱을 여러번 초기화 하지 않도록 한다.
 import { initializeFirebaseOnce } from "../initialize-firebase-once";

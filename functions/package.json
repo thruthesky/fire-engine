@@ -13,7 +13,8 @@
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
     "test:user-count": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/user-count.spec.ts  --timeout 10000",
-    "test:user-get": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/user-get.spec.ts  --timeout 10000"
+    "test:user-get": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/user-get.spec.ts  --timeout 10000",
+    "test:event-test": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/etc/event-test.spec.ts  --timeout 10000"
   },
   "engines": {
     "node": "18"

@@ -49,8 +49,8 @@ export class Config {
 
     /**
      * debug 가 true 일 때만 로그를 남긴다.
-     * @param message message to log
-     * @param optionalParams optinal parameters to log
+     * @param {string} message message to log
+     * @param {any} optionalParams optional parameters to log
      */
     static log(message: string,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -60,21 +60,16 @@ export class Config {
         }
     }
 
-
-    /**
-     * 푸시 알림을 보낼 때, 잘못된 토큰이 있으면 삭제를 할 것인지 여부.
-     *
-     * 주의 할 점은 올바른 토큰임에도 불구하고 Network 에러나 기타 설정, 서버 등의 에러로 인해서 푸시 알림 전송시 에러(잘못된 토큰)로 인식될 수 있다.
-     * 그래서, 가능한 이 값을 false 로 하여, 푸시 알림을 할 때 잘못된 토큰을 삭제하지 않을 것을 권장한다. 잘못된 토큰을 DB 에 계속 남겨 두고, 반복적으로 푸시 알림 에러가 떠도 큰 문제가 없다.
-     * 이 값이 true 로 지정되면, 잘못된 토큰을 삭제한다.
-     */
+    // 푸시 알림을 보낼 때, 잘못된 토큰이 있으면 삭제를 할 것인지 여부.
+    // 주의 할 점은 올바른 토큰임에도 불구하고 Network 에러나 기타 설정, 서버 등의 에러로 인해서 푸시 알림 전송시 에러(잘못된 토큰)로 인식될 수 있다.
+    // 그래서, 가능한 이 값을 false 로 하여, 푸시 알림을 할 때 잘못된 토큰을 삭제하지 않을 것을 권장한다. 잘못된 토큰을 DB 에 계속 남겨 두고, 반복적으로 푸시 알림 에러가 떠도 큰 문제가 없다.
+    // 이 값이 true 로 지정되면, 잘못된 토큰을 삭제한다.
     static removeBadTokens = false;
 
-    /**
-     * 푸시 알림을 보낼 때, dry run 을 할 것인지 여부.
-     *
-     * dry run 을 true 로 하면, 실제로 메시지가 전달되지 않는다. 즉, 테스트 할 때에만 true 로 한다.
-     */
-    static messagingDryRun = false;
 
+    // 푸시 알림을 보낼 때, dry run 을 할 것인지 여부.
+    // dry run 을 true 로 하면, 실제로 메시지가 전달되지 않는다. 즉, 테스트 할 때에만 true 로 한다.
+    static messagingDryRun = false;
 }
+
+
