@@ -5,8 +5,8 @@
     "lint:fix": "eslint \"src/**/*\" --fix",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "mocha": "mocha  --require ts-node/register integration-tests/integration-test.spec.ts --timeout 10000",
-    "test": "(cd integration-tests && firebase emulators:exec 'npm run mocha' -P demo-test)",
+    "test": "(cd integration-tests && firebase emulators:exec 'mocha --require ts-node/register integration-test.spec.ts --timeout 10000' -P demo-test)",
+    "integration-test:postSummaries": "(cd integration-tests && firebase emulators:exec 'mocha --require ts-node/register postSummaries.spec.ts --timeout 10000' -P withcenter-test-3)",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
@@ -14,7 +14,8 @@
     "logs": "firebase functions:log",
     "test:user-count": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/user-count.spec.ts  --timeout 10000",
     "test:user-get": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/user-get.spec.ts  --timeout 10000",
-    "test:event-test": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/etc/event-test.spec.ts  --timeout 10000"
+    "test:event-test": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/etc/event-test.spec.ts  --timeout 10000",
+    "test:postSummaries": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/post/postSummaries.spec.ts  --timeout 10000"
   },
   "engines": {
     "node": "18"
