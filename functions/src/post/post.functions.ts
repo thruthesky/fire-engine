@@ -7,9 +7,9 @@
 // import * as logger from "firebase-functions/logger";
 // import { getDatabase } from "firebase-admin/database";
 import * as functions from "firebase-functions";
-import { Config } from "../config";
-import { isCreate, isDelete, isUpdate } from "../library";
-import { PostService } from "./post.service";
+import {Config} from "../config";
+import {isCreate, isDelete, isUpdate} from "../library";
+import {PostService} from "./post.service";
 
 
 /**

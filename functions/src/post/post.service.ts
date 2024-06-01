@@ -1,6 +1,6 @@
-import { getDatabase } from "firebase-admin/database";
-import { Post, PostCreateBackgroundEvent, PostSummary, PostSummaryAll } from "./post.interface";
-import { Config } from "../config";
+import {getDatabase} from "firebase-admin/database";
+import {Post, PostCreateBackgroundEvent, PostSummary, PostSummaryAll} from "./post.interface";
+import {Config} from "../config";
 
 /**
  * Post service class
@@ -8,7 +8,7 @@ import { Config } from "../config";
 export class PostService {
     /**
      * Returns a post from the database under '/posts/category/postId'.
-     * 
+     *
      *
      * @param {string} category 카테고리
      * @param {stirng} postId 글 아이디
@@ -30,9 +30,9 @@ export class PostService {
      * @return {Promise<void>} the promise of the operation
      */
     static async setSummary(post: PostCreateBackgroundEvent, category: string, id: string,): Promise<void> {
-        if (post.uid === undefined) throw new Error('uid is required');
-        if (post.createdAt === undefined) throw new Error('createdAt is required');
-        if (post.order === undefined) throw new Error('order is required');
+        if (post.uid === undefined) throw new Error("uid is required");
+        if (post.createdAt === undefined) throw new Error("createdAt is required");
+        if (post.order === undefined) throw new Error("order is required");
         const summary = {
             uid: post.uid,
             createdAt: post.createdAt,
@@ -57,8 +57,8 @@ export class PostService {
     /**
      * deletes the summary of the post in `post-summaries` and `post-all-summary`
      *
-     * @param category category of the post
-     * @param postId post id
+     * @param {string} category category of the post
+     * @param {stirng} postId post id
      */
     static async deleteSummary(category: string, postId: string) {
         const db = getDatabase();
@@ -66,6 +66,5 @@ export class PostService {
         await db.ref(`${Config.postAllSummaries}/${postId}`).remove();
     }
 }
-
 
 

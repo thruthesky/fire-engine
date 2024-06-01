@@ -16,14 +16,15 @@ admin.initializeApp();
 
 
 export * from "./etc/etc.functions";
+export * from "./messaging/messaging.functions";
 export * from "./post/post.functions";
 export * from "./user/user.functions";
 
 
 exports.greetTheWorld = functions.https.onRequest(
     (req: functions.Request, res: functions.Response) => {
-    // Here we reference a user-provided parameter
-    // (its value is provided by the user during installation)
+        // Here we reference a user-provided parameter
+        // (its value is provided by the user during installation)
         const consumerProvidedGreeting = process.env.GREETING;
 
         // And here we reference an auto-populated parameter

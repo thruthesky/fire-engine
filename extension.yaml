@@ -3,7 +3,7 @@
 
 # Identifier for your extension
 name: fff
-version: 0.0.2  # Follow semver versioning
+version: 0.0.12  # Follow semver versioning
 specVersion: v1beta  # Version of the Firebase Extensions specification
 
 # Friendly display name for your extension (~3-5 words)
@@ -38,8 +38,8 @@ billingRequired: true
 roles:
   - role: firebasedatabase.admin
     reason: Allows the extension to read and write to the Firebase Realtime Database.
-  # - role: firebaseauth.admin
-  #   reason: Allows the extension to update the user custom claims in Firebase Auth.
+  - role: firebasenotifications.admin
+    reason: Allows the extension to send push notifications.
   # - role: datastore.owner
   #   reason: Allows the extension to update the response of the command execution to Firestore.
 # In the `resources` field, list each of your extension's functions, including the trigger for each function.
@@ -55,6 +55,14 @@ resources:
       eventTrigger:
         eventType: providers/google.firebase.database/eventTypes/ref.write
         resource: projects/_/instances/${DATABASE_INSTANCE}/refs/posts/{category}/{postId}
+      runtime: "nodejs18"
+  - name: sendPushNotifications
+    type: firebaseextensions.v1beta.function
+    description: >-
+      Send a push notification from the given token, title and body.
+    properties:
+      location: ${LOCATION}
+      httpsTrigger: {}
       runtime: "nodejs18"
 
 # In the `params` field, set up your extension's user-configured parameters.
