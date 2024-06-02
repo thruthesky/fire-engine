@@ -109,6 +109,14 @@ You can get the endpoint of the API from your Firebase console.
 ```
 
 
+## 좋아요
+
+- 좋아요를 하는 경우, `tests/user/userLike.spec.ts` 를 보면 보다 자세히 어떻게 동작하는지 알 수 있다.
+- 클라이언트가 `/who-i-like/<my-uid> {otherUid: true}` 를 저장하면 `src/user/user.functions.ts` 의 `userLike` background cloud event trigger 함수가 동작을 한다.
+- 메시지를 보낸 사용자의 이름을 가져오고, 메시지를 받는 사용자의 언어를 가져와서, 메시지를 받는 사용자의 언어로 번역하여 메시지를 전송한다.
+
+
+
 
 
 ## Knwon issues

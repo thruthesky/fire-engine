@@ -35,28 +35,30 @@ export function isDelete(change: functions.Change<functions.database.DataSnapsho
 }
 
 
-
 /**
  * Returns chunks of the array
  *
- * 
+ *
+ * @param {T[]} myArray The array to be chunked
+ * @param {number} chunkSize The size of the chunk
+ *
  * @return {number}
- * 
+ *
  * see `chunkArray.spec.ts` for the test
- * 
+ *
  */
-export function chunkArray(myArray: any[], chunk_size: number): any[][] {
+export function chunkArray<T>(myArray: T[], chunkSize: number): T[][] {
     const results = [];
     while (myArray.length) {
-        results.push(myArray.splice(0, chunk_size));
+        results.push(myArray.splice(0, chunkSize));
     }
-    return results;
+    return results as T[][];
 }
 
 /**
  * This function retrieves the project ID from the Firebase admin app options.
- * 
- * @returns {string} The project ID. If the project ID is not set in the app options, 
+ *
+ * @return {string} The project ID. If the project ID is not set in the app options,
  * it tries to retrieve it from the credential options. If it's not there either, it returns an empty string.
  */
 export function getProjectID(): string {
@@ -64,5 +66,15 @@ export function getProjectID(): string {
     // Return the project ID from the app options, or from the credential options if it's not set in the app options
     // If it's not set in either, return an empty string
     return app.options.projectId ||
-        (app.options.credential && (app.options.credential as unknown as { projectId: string }).projectId) || '';
+        (app.options.credential && (app.options.credential as unknown as { projectId: string }).projectId) || "";
+}
+
+
+/**
+ * Debug console log
+ *
+ * @param {unknown[]} args arguments to be logged to the console
+ */
+export function dog(...args: unknown[]) {
+    console.log("-- dog;", ...args);
 }

@@ -1,8 +1,9 @@
 import * as functions from "firebase-functions";
 import {Config} from "../config";
-import {isCreate, isDelete, isUpdate} from "../library";
+import {dog, isCreate, isDelete, isUpdate} from "../library";
 
 import {ServerValue, getDatabase} from "firebase-admin/database";
+import {MessagingService} from "../messaging/messaging.service";
 
 
 // phoneNumberRegister
@@ -13,34 +14,41 @@ import {ServerValue, getDatabase} from "firebase-admin/database";
 
 
 /**
- * Post write 이벤트가 발생하면, 해당 포스트의 요약 정보를 업데이트 한다.
+ * 좋아요 이벤트가 발생하면, 푸시 알림을 보낸다.
  */
 export const userLike = functions.database.ref(`${Config.whoILike}/{myUid}/{targetUid}`)
     .onWrite(async (change: functions.Change<functions.database.DataSnapshot>, context: functions.EventContext<{
     myUid: string;
     targetUid: string;
   }>) => {
+        dog("-- userLike begins; change.before:", change.before.val(), "change.after:", change.after.val());
         const db = getDatabase();
         const myUid = context.params.myUid;
         const targetUid = context.params.targetUid;
 
+        dog("-- userLike path; myUid:", myUid, "targetUid:", targetUid);
+
+
         // created or updated
         if (isCreate(change) || isUpdate(change)) {
+            dog("-- userLike; create or update;");
             await db.ref(`${Config.whoLikeMe}/${targetUid}`).update({[myUid]: true});
             await db.ref(`users/${targetUid}`).update({noOfLikes: ServerValue.increment(1)});
         } else if (isDelete(change)) {
+            dog("-- userLike; delete;");
             // deleted
             await db.ref(`${Config.whoLikeMe}/${targetUid}/${myUid}`).remove();
             await db.ref(`users/${targetUid}`).update({noOfLikes: ServerValue.increment(-1)});
         }
 
-    // / TODO - 여기서 부터, 푸시 알림 전송하기
-    // Send message to the target user
-    // if (isCreate(event)) {
-    //   await MessagingService.sendMessageWhenUserLikeMe({
-    //     uid: targetUid,
-    //     otherUid: myUid,
-    //   });
-    // }
+
+        // Send message to the target user
+        if (isCreate(change)) {
+            dog("-- userLike; send message;");
+            await MessagingService.sendMessageWhenUserLikeMe({
+                receiverUid: targetUid,
+                senderUid: myUid,
+            });
+        }
     });
 

@@ -20,7 +20,9 @@
     "test:sendPushNotifications": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/messaging/sendPushNotifications.spec.ts  --timeout 10000",
     "test:call-remote-sendPushNotifications": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/messaging/call-remote-sendPushNotification.spec.ts --timeout 10000",
     "test:chunkArray": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/library/chunkArray.spec.ts --timeout 10000",
-    "test:getProjectID": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/library/getProjectID.spec.ts --timeout 10000"
+    "test:getProjectID": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/library/getProjectID.spec.ts --timeout 10000",
+    "test:userLike": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/userLike.spec.ts --timeout 10000",
+    "test:realtime-database": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/realtime-database/realtime-database.spec.ts --timeout 10000"
   },
   "engines": {
     "node": "18"
