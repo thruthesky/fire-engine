@@ -8,9 +8,19 @@
  * @tokens: Array of tokens to send the message to
  * @data: Additional data to be sent
  */
-export interface SendMessage {
+export interface SendMultiMessages {
     title: string;
     body: string;
-    tokens: string[];
+    tokens: string | string[];
     data?: any;
+    shortErrorMessage?: boolean;
+    maxConcurrent?: number;
+}
+export interface SendOneMessage {
+    title: string;
+    body: string;
+    token: string;
+    data?: any;
+    accessToken: string;
+    shortErrorMessage?: boolean;
 }

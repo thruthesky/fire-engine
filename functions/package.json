@@ -18,7 +18,9 @@
     "test:postSummaries": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/post/postSummaries.spec.ts  --timeout 10000",
     "test:access-token": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/library/getGoogleApiOauthAccessToken.spec.ts  --timeout 10000",
     "test:sendPushNotifications": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/messaging/sendPushNotifications.spec.ts  --timeout 10000",
-    "test:call-remote-sendPushNotifications": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/messaging/call-remote-sendPushNotification.spec.ts --timeout 10000"
+    "test:call-remote-sendPushNotifications": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/messaging/call-remote-sendPushNotification.spec.ts --timeout 10000",
+    "test:chunkArray": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/library/chunkArray.spec.ts --timeout 10000",
+    "test:getProjectID": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/library/getProjectID.spec.ts --timeout 10000"
   },
   "engines": {
     "node": "18"

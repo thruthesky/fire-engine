@@ -70,6 +70,11 @@ export class Config {
     // 푸시 알림을 보낼 때, dry run 을 할 것인지 여부.
     // dry run 을 true 로 하면, 실제로 메시지가 전달되지 않는다. 즉, 테스트 할 때에만 true 로 한다.
     static messagingDryRun = false;
+
+
+    // 푸시 알림을 보낼 때, 한번의 batch 작업에서 보낼 수 있는 최대 토큰 수.
+    // 예를 들어 총 토큰의 수가 101 개 이고, 이 값이 100 이면, 100 개의 토큰을 한번에 보내고, 나머지 1개의 토큰을 다시 보낸다. 즉, 두번 batch 작업을 한다.
+    static fcmMaxConcurrentConnections = 100;
 }
 
 
