@@ -205,6 +205,8 @@ export class MessagingService {
      * This method is invoked by the user-B likes user-A, and send messages to all devices of A.
      *
      * @param {UserLikeEvent} event - The event triggered when a user likes another user.
+     * 
+     * @return {Promise<Array<{ [key: string]: unknown }>>} Array of results. This is same result of 'sendMulti'.
      */
     static async sendMessageWhenUserLikeMe(event: UserLikeEvent): Promise<Array<{ [key: string]: unknown }>> {
         console.log("sendMessageWhenUserLikeMe: event:", event);

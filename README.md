@@ -28,6 +28,7 @@ You can get the endpoint of the API from your Firebase console.
 
 
 
+
 ### 에러
 
 메시지 전송을 할 때, 결과는 배열로 넘어 온다. 에러가 있어도 배열로 넘어 온다.
