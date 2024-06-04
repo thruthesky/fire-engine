@@ -1,11 +1,11 @@
 import * as admin from "firebase-admin";
-import axios, { AxiosError } from "axios";
-import { NotificationToUids, SendMultiMessages, SendOneMessage, UserLikeEvent } from "./messaging.interfaces";
-import { Config } from "../config";
-import { chunkArray, dog, getProjectID } from "../library";
-import { UserService } from "../user/user.service";
-import { UserSettingService } from "../user-setting/user-setting.service";
-import { T } from "../texts";
+import axios, {AxiosError} from "axios";
+import {NotificationToUids, SendMultiMessages, SendOneMessage, UserLikeEvent} from "./messaging.interfaces";
+import {Config} from "../config";
+import {chunkArray, dog, getProjectID} from "../library";
+import {UserService} from "../user/user.service";
+import {UserSettingService} from "../user-setting/user-setting.service";
+import {T} from "../texts";
 
 
 /* eslint-disable valid-jsdoc */
@@ -45,27 +45,27 @@ export class MessagingService {
         // ---- 입력 값 체크 ---
         //
         if (!message.tokens) {
-            return [{ code: "messaging/missing-tokens", message: "tokens is required" }];
+            return [{code: "messaging/missing-tokens", message: "tokens is required"}];
         }
         // 토큰인 문자열로 들어오면, 배열로 변환한다.
         if (typeof message.tokens === "string") {
             message.tokens = (message.tokens as string).split(",");
         }
         if (message.tokens.length === 0) {
-            return [{ code: "messaging/missing-tokens", message: "tokens is required" }];
+            return [{code: "messaging/missing-tokens", message: "tokens is required"}];
         }
         if (!message.title) {
-            return [{ code: "messaging/missing-title", message: "title is required" }];
+            return [{code: "messaging/missing-title", message: "title is required"}];
         }
         if (!message.body) {
-            return [{ code: "messaging/missing-body", message: "body is required" }];
+            return [{code: "messaging/missing-body", message: "body is required"}];
         }
 
 
         // Firebase Admin SDK 에서 short-lived OAuth2 access token 을 가져온다. Bearer 토큰으로 사용한다.
         const accessToken = await this.getAccessToken();
         if (!accessToken) {
-            return [{ code: "messaging/failed-to-get-access-token", message: "Failed to get access token" }];
+            return [{code: "messaging/failed-to-get-access-token", message: "Failed to get access token"}];
         }
 
 
@@ -129,7 +129,7 @@ export class MessagingService {
                 },
             });
             console.log("sendOne: success: re:", re.data);
-            return { code: "", token: message.token, message: "" };
+            return {code: "", token: message.token, message: ""};
         } catch (e) {
             if (e instanceof AxiosError) {
                 const error = e.response?.data.error;
@@ -181,14 +181,14 @@ export class MessagingService {
     static async sendNotificationToUids(message: NotificationToUids): Promise<Array<{ [key: string]: unknown }>> {
         const uids = message.uids;
         if (!uids) {
-            return [{ code: "messaging/missing-uids", message: "uids is required" }];
+            return [{code: "messaging/missing-uids", message: "uids is required"}];
         }
         if (uids.length === 0) {
-            return [{ code: "messaging/missing-uids", message: "uids is required" }];
+            return [{code: "messaging/missing-uids", message: "uids is required"}];
         }
         const tokens = await UserService.getTokens(uids);
         if (tokens.length === 0) {
-            return [{ code: "messaging/missing-tokens", message: "No tokens found" }];
+            return [{code: "messaging/missing-tokens", message: "No tokens found"}];
         }
 
         return this.sendMulti({
@@ -205,7 +205,7 @@ export class MessagingService {
      * This method is invoked by the user-B likes user-A, and send messages to all devices of A.
      *
      * @param {UserLikeEvent} event - The event triggered when a user likes another user.
-     * 
+     *
      * @return {Promise<Array<{ [key: string]: unknown }>>} Array of results. This is same result of 'sendMulti'.
      */
     static async sendMessageWhenUserLikeMe(event: UserLikeEvent): Promise<Array<{ [key: string]: unknown }>> {

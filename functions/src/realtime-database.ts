@@ -8,7 +8,7 @@ import * as admin from "firebase-admin";
  * @return {T}
  * - The value of the path
  * - `null` if the path does not exist
- * 
+ *
  * @see `realtime-database.spec.ts` for the test and detailed usage
  */
 export async function databaseGet<T>(path: string): Promise<T> {

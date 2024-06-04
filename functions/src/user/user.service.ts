@@ -1,8 +1,8 @@
-import { getDatabase } from "firebase-admin/database";
-import { Config } from "../config";
-import { DeleteAccountResponse, User, UserCreateWithPhoneNumber, UserCreateWithPhoneNumberResponse } from "./user.interfaces";
-import { getAuth } from "firebase-admin/auth";
-import { databaseGet } from "../realtime-database";
+import {getDatabase} from "firebase-admin/database";
+import {Config} from "../config";
+import {DeleteAccountResponse, User, UserCreateWithPhoneNumber, UserCreateWithPhoneNumberResponse} from "./user.interfaces";
+import {getAuth} from "firebase-admin/auth";
+import {databaseGet} from "../realtime-database";
 
 
 /**
@@ -43,19 +43,19 @@ export class UserService {
     static async createAccountWithPhoneNumber(params: UserCreateWithPhoneNumber): Promise<UserCreateWithPhoneNumberResponse> {
         const auth = getAuth();
         try {
-            const userRecord = await auth.createUser({ phoneNumber: params.phoneNumber });
+            const userRecord = await auth.createUser({phoneNumber: params.phoneNumber});
             const customToken = await auth.createCustomToken(userRecord.uid);
-            return { uid: userRecord.uid, customToken };
+            return {uid: userRecord.uid, customToken};
         } catch (e) {
             if (e instanceof Error) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 if ((e as any).errorInfo.code) {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    return { code: (e as any).errorInfo.code, message: (e as any).errorInfo.message, phoneNumber: params.phoneNumber };
+                    return {code: (e as any).errorInfo.code, message: (e as any).errorInfo.message, phoneNumber: params.phoneNumber};
                 }
-                return { code: e.name, message: e.message };
+                return {code: e.name, message: e.message};
             } else {
-                return { code: "unknown", message: "unknown error" };
+                return {code: "unknown", message: "unknown error"};
             }
         }
     }
@@ -75,14 +75,14 @@ export class UserService {
      */
     static async deleteAccount(inputUid?: string): Promise<DeleteAccountResponse> {
         if (!inputUid) {
-            return { code: "no-uid", message: "Pass uid to delete an account.", uid: "" };
+            return {code: "no-uid", message: "Pass uid to delete an account.", uid: ""};
         }
         const uid = inputUid;
         // Delete user account
         const auth = getAuth();
         try {
             await auth.deleteUser(uid);
-            return { code: "ok", uid: uid };
+            return {code: "ok", uid: uid};
 
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -91,11 +91,11 @@ export class UserService {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 if ((e as any).errorInfo.code) {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    return { code: (e as any).errorInfo.code, message: (e as any).errorInfo.message, uid: uid };
+                    return {code: (e as any).errorInfo.code, message: (e as any).errorInfo.message, uid: uid};
                 }
-                return { code: e.name, message: e.message, uid: uid };
+                return {code: e.name, message: e.message, uid: uid};
             } else {
-                return { code: "unknown", message: `${e}`, uid: uid };
+                return {code: "unknown", message: `${e}`, uid: uid};
             }
         }
     }

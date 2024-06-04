@@ -1,7 +1,7 @@
-import { getDatabase } from "firebase-admin/database";
-import { Config } from "../config";
-import { databaseGet } from "../realtime-database";
-import { UserSetting } from "./user-setting.interfaces";
+import {getDatabase} from "firebase-admin/database";
+import {Config} from "../config";
+import {databaseGet} from "../realtime-database";
+import {UserSetting} from "./user-setting.interfaces";
 
 
 /**
@@ -29,5 +29,4 @@ export class UserSettingService {
     static async getLanguageCode(uid: string): Promise<string> {
         return await databaseGet(`${Config.userSettings}/${uid}/languageCode`);
     }
-
 }
