@@ -37,6 +37,7 @@ describe('sendPushNotifications', () => {
         // console.log('send failure -> re; ', re.data);
         expect(re.data[0].code).to.equal('messaging/send-one-error');
     });
+
     it('Send failure due to wrong token', async () => {
         const re = await axios.get(url + '?tokens=a,b,c&title=t&body=b&shortErrorMessage=true');
         // console.log('send failure -> re; ', re.data);
