@@ -20,9 +20,6 @@ describe('User like test', () => {
     const targetUid = 'B';
     const path = `${Config.whoILike}/${myUid}/${targetUid}`;
 
-
-
-
     // A 가 B 를 좋아요 할 때,
     it('A like B', async () => {
 
@@ -39,8 +36,6 @@ describe('User like test', () => {
         // B 의 언어를 한국어로 설정하여 메시지가 한국어로 전달되게 테스트 한다.
         await databaseSet(`${Config.userSettings}/${targetUid}/languageCode`, 'ko');
 
-
-
         // 좋아요 수행, 클라우드 함수 호출
         const wrapped = test().wrap(userLike);
         const createSnap = test().database.makeDataSnapshot(true, path);
@@ -55,7 +50,6 @@ describe('User like test', () => {
                 params: { myUid, targetUid },
             }
         );
-
 
         // B 의 누가 나를 좋아요 했는지 정보 확인
         const snapshot2 = await getDatabase().ref(`${Config.whoLikeMe}`).get();
