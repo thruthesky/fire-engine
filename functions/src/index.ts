@@ -15,6 +15,7 @@ import * as admin from "firebase-admin";
 admin.initializeApp();
 
 
+export * from "./chat/chat.functions";
 export * from "./etc/etc.functions";
 export * from "./messaging/messaging.functions";
 export * from "./post/post.functions";

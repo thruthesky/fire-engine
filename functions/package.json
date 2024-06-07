@@ -22,7 +22,11 @@
     "test:chunkArray": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/library/chunkArray.spec.ts --timeout 10000",
     "test:getProjectID": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/library/getProjectID.spec.ts --timeout 10000",
     "test:userLike": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/userLike.spec.ts --timeout 10000",
-    "test:realtime-database": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/realtime-database/realtime-database.spec.ts --timeout 10000"
+    "test:realtime-database": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/realtime-database/realtime-database.spec.ts --timeout 10000",
+    "test:chatPassword": "mocha --require ts-node/register tests/chat/chatPassword.spec.ts --watch --watch-files 'src/**/*.ts,tests/**/*.ts'",
+    "test:ChatService.join": "mocha --require ts-node/register tests/chat/ChatService.join.spec.ts --watch --watch-files 'src/**/*.ts,tests/**/*.ts'",
+    "test:joinWithPassword": "mocha --require ts-node/register tests/chat/joinWithPassword.spec.ts --watch --watch-files 'src/**/*.ts,tests/**/*.ts'",
+    "test:e2e:joinWithPassword": "mocha --require ts-node/register tests/chat/e2e:joinWithPassword.spec.ts --watch --watch-files 'src/**/*.ts,tests/**/*.ts'"
   },
   "engines": {
     "node": "18"

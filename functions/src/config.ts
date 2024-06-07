@@ -43,6 +43,15 @@ export class Config {
 
     static comments = "comments";
 
+    /**
+     * Returns the path of the chat room
+     * @param roomId chat room id
+     * @returns {string} path of the chat room
+     */
+    static chatRoomPath(roomId: string) {
+        return `chat-rooms/${roomId}`;
+    }
+
 
     // Command paths
     static commands = "commands";
