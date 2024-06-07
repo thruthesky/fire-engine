@@ -69,7 +69,7 @@ export class ChatService {
      * @param {string} password password
      */
     static async setPassword(roomId: string, password: string): Promise<void> {
-        await admin.database().ref(`settings/chat/${roomId}/password`).set(password);
+        await admin.database().ref(`${Config.chatRoomSettingPath(roomId)}/password`).set(password);
     }
 
     /**
@@ -85,12 +85,14 @@ export class ChatService {
         if (!roomId) {
             return { code: ERROR_EMPTY_CHAT_PASSWORD };
         }
+
+        //
         if (!password) {
             return { code: ERROR_EMPTY_ROOM_ID };
         }
 
         // get chat room password
-        const snapshot = await admin.database().ref(`settings/chat/${roomId}/password`).get();
+        const snapshot = await admin.database().ref(`${Config.chatRoomSettingPath(roomId)}/password`).get();
         if (!snapshot.exists()) {
             return { code: ERROR_CHAT_ROOM_SETTING_NOT_EXIST };
         }

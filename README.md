@@ -182,6 +182,12 @@ You can get the endpoint of the API from your Firebase console.
 
 
 
+## 비밀번호를 통해서 채팅방 입장
+
+- 채팅방에 입장을 하려고 할 때, 채팅방 설정에 비밀번호가 있으면, security rules 에 의해서 client end 에서 join 을 못한다.
+- `chatJoinWithPassword` 함수를 통해서 join 을 할 수 있다.
+
+
 
 
 ## Knwon issues

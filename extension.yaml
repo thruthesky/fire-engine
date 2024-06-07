@@ -3,7 +3,7 @@
 
 # Identifier for your extension
 name: fff
-version: 0.0.16  # Follow semver versioning
+version: 0.0.17  # Follow semver versioning
 specVersion: v1beta  # Version of the Firebase Extensions specification
 
 # Friendly display name for your extension (~3-5 words)
@@ -74,6 +74,15 @@ resources:
         eventType: providers/google.firebase.database/eventTypes/ref.write
         resource: projects/_/instances/${DATABASE_INSTANCE}/refs/who-i-like/{myUid}/{targetUid}
       runtime: "nodejs18"
+  - name: chatJoinWithPassword
+    type: firebaseextensions.v1beta.function
+    description: >-
+      Join a chat room with password.
+    properties:
+      # httpsTrigger is used for an HTTP triggered function.
+      httpsTrigger: {}
+      runtime: "nodejs18"
+
 # In the `params` field, set up your extension's user-configured parameters.
 # Learn more in the docs:
 # https://firebase.google.com/docs/extensions/reference/extension-yaml#params-field

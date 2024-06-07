@@ -48,8 +48,12 @@ export class Config {
      * @param roomId chat room id
      * @returns {string} path of the chat room
      */
-    static chatRoomPath(roomId: string) {
+    static chatRoomPath(roomId: string): string {
         return `chat-rooms/${roomId}`;
+    }
+
+    static chatRoomSettingPath(roomId: string) {
+        return `settings/chat-rooms/${roomId}`;
     }
 
 

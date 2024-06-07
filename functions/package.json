@@ -26,7 +26,7 @@
     "test:chatPassword": "mocha --require ts-node/register tests/chat/chatPassword.spec.ts --watch --watch-files 'src/**/*.ts,tests/**/*.ts'",
     "test:ChatService.join": "mocha --require ts-node/register tests/chat/ChatService.join.spec.ts --watch --watch-files 'src/**/*.ts,tests/**/*.ts'",
     "test:joinWithPassword": "mocha --require ts-node/register tests/chat/joinWithPassword.spec.ts --watch --watch-files 'src/**/*.ts,tests/**/*.ts'",
-    "test:e2e:joinWithPassword": "mocha --require ts-node/register tests/chat/e2e:joinWithPassword.spec.ts --watch --watch-files 'src/**/*.ts,tests/**/*.ts'"
+    "test:e2e:chatJoinWithPassword": "mocha --require ts-node/register tests/chat/e2e:jchatJinWithPassword.spec.ts --watch --watch-files 'src/**/*.ts,tests/**/*.ts'"
   },
   "engines": {
     "node": "18"
