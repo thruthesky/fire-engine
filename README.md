@@ -120,6 +120,70 @@ You can get the endpoint of the API from your Firebase console.
 
 
 
+## On call functions
+
+- 정확하기 작업을 하기 위해서, firebase event trigger 로 연결하면 안되고, on call 함수로 바로 접속해야 한다. 그렇지 않으면 코드가 꼬이게 된다.
+
+- The Command is an interface to execute specific code that is restricted to run in Firebase Cloud Functions. For example, if an app admin wants to disable a user, the corresponding code to perform this action must be executed within Firebase Cloud Functions only.
+
+- With this command interface., the client app can do things like delete, disable, enable user accounts and more.
+
+- The command is working as cloud function event trigger. Meaning, the clinet app can simply create a data under `/commands/<login-user-uid>`.
+    - The creation of the command data is secured by security rules. And the authentication validation is done with security rules.
+
+- The instruction of the command is formed like below.
+
+```json
+{
+    "command": "the command",
+    "uid": "The uid of the user to be affected",
+    "createdAt": "timestamp",
+    "endedAt": "timestamp",
+    "result": "success or failed"
+}
+```
+
+
+### Disable user
+
+- Admin can disable or enable a user. If the user is disabled, then the user can't sign in anymore, nor refresh their ID token. In the security rule, if a user is disabled, the user no longer owns the request.auth.uid (within an hour from the time that the user disabled). So, all the security rules would fails.
+  - When a user is diabled, the `disabled` field will be set to true.
+
+- The instruction of the command is formed like below.
+
+```json
+/commands/<admin-uid> {
+    "command": "diable-user",
+    "uid": "The uid of the user to be deleted",
+    "createdAt": "timestamp",
+    "endedAt": "timestamp",
+    "result": "success"
+}
+```
+
+### Enable user
+
+- Enabling a user is similiar to Disabling user.
+
+
+### Delete a user
+
+- A user can delete himself.
+
+```json
+/commands/<login-user-uid> {
+    "command": "delete-user",
+    "uid": "login-user-uid",
+    "createdAt": "timestamp",
+    "endedAt": "timestamp",
+    "result": "success"
+}
+```
+
+
+
+
+
 ## Knwon issues
 
 
