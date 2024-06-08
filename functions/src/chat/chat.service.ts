@@ -1,7 +1,8 @@
 
 import * as admin from "firebase-admin";
-import { Config } from "../config";
-import { ERROR_CHAT_ROOM_SETTING_NOT_EXIST, ERROR_EMPTY_CHAT_PASSWORD, ERROR_EMPTY_ROOM_ID, ERROR_WORNG_CHAT_PASSWORD, SUCCESS } from "../definitions";
+import {Config} from "../config";
+import {ERROR_CHAT_ROOM_SETTING_NOT_EXIST, ERROR_EMPTY_CHAT_PASSWORD, ERROR_EMPTY_ROOM_ID, ERROR_WORNG_CHAT_PASSWORD, SUCCESS} from "../definitions";
+import {dog} from "../library";
 
 /**
  * ChatService
@@ -21,7 +22,7 @@ export class ChatService {
             return false;
         }
         // get password
-        const snapshot = await admin.database().ref(`settings/chat/${roomId}/password`).get();
+        const snapshot = await admin.database().ref(`${Config.chatRoomSettingPath(roomId)}/password`).get();
         if (!snapshot.exists()) {
             return false;
         }
@@ -42,9 +43,9 @@ export class ChatService {
 
     /**
      * Let the user join the chat room
-     * 
+     *
      * Even if the user is already joined, this function does not throw an error.
-     * 
+     *
      * @param {string} roomId chat room id
      * @param {string} uid uid of the user to be joined
      */
@@ -54,10 +55,13 @@ export class ChatService {
 
     /**
      * Returns the chat room data
-     * @param roomId chat room id
-     * @returns {{[key:string]: any}}
+     *
+     * @param {string} roomId chat room id
+     * @return {Promise<*>}
+     *
+     *
      */
-    static async getRoom(roomId: string): Promise<{ [key: string]: any }> {
+    static async getRoom(roomId: string): Promise<{ [key: string]: any }> { // eslint-disable-line
         const snapshot = await admin.database().ref(Config.chatRoomPath(roomId)).get();
         return snapshot.val();
     }
@@ -74,36 +78,37 @@ export class ChatService {
 
     /**
      * Let the user join the chat room with the password.
-     * 
-     * @param roomId chat room id
-     * @param password chat room password to join
-     * @param uid the user's uid to be joined
-     * @returns {{code: string }}
+     *
+     * @param {string} roomId chat room id
+     * @param {string} password chat room password to join
+     * @param {string} uid the user's uid to be joined
+     * @return {{code: string }}
      */
     static async joinWithPassword(roomId: string, password: string, uid: string): Promise<{ code: string }> {
+        dog(`joinWithPassword: roomId=${roomId}, password=${password}, uid=${uid}`);
 
         if (!roomId) {
-            return { code: ERROR_EMPTY_CHAT_PASSWORD };
+            return {code: ERROR_EMPTY_CHAT_PASSWORD};
         }
 
         //
         if (!password) {
-            return { code: ERROR_EMPTY_ROOM_ID };
+            return {code: ERROR_EMPTY_ROOM_ID};
         }
 
         // get chat room password
         const snapshot = await admin.database().ref(`${Config.chatRoomSettingPath(roomId)}/password`).get();
         if (!snapshot.exists()) {
-            return { code: ERROR_CHAT_ROOM_SETTING_NOT_EXIST };
+            return {code: ERROR_CHAT_ROOM_SETTING_NOT_EXIST};
         }
 
         const re = await ChatService.checkPassword(roomId, password);
         if (re == false) {
-            return { code: ERROR_WORNG_CHAT_PASSWORD };
+            return {code: ERROR_WORNG_CHAT_PASSWORD};
         }
 
         await ChatService.join(roomId, uid);
-        return { code: SUCCESS };
+        return {code: SUCCESS};
     }
 }
 

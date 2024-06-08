@@ -3,7 +3,7 @@
 
 # Identifier for your extension
 name: fff
-version: 0.0.17  # Follow semver versioning
+version: 0.0.22  # Follow semver versioning
 specVersion: v1beta  # Version of the Firebase Extensions specification
 
 # Friendly display name for your extension (~3-5 words)
@@ -36,6 +36,8 @@ billingRequired: true
 # Learn more in the docs:
 # https://firebase.google.com/docs/extensions/reference/extension-yaml#roles-field
 roles:
+  - role: firebaseauth.admin
+    reason: Allows the extension to access to Firebase Auth.
   - role: firebasedatabase.admin
     reason: Allows the extension to read and write to the Firebase Realtime Database.
   - role: firebasenotifications.admin

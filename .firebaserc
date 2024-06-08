@@ -5,7 +5,9 @@
   "targets": {},
   "etags": {
     "withcenter-test-3": {
-      "extensionInstances": {}
+      "extensionInstances": {
+        "fff": "6e18b2a10df375bde7a98461086d0c9642fd0901f7a59b376819212ccc42e1f0"
+      }
     }
   },
   "dataconnectEmulatorConfig": {}

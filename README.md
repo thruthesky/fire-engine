@@ -11,6 +11,20 @@ This extension simplifies the installation and management of Firebase Cloud Func
 2. Give `firebase.admin` role to the service account of the FireFlutter Extension Instance. This is a temporary workaround until there would be a solution of `IAM_PERMISSION_DENIED of cloudmessaging.messages.create`.
 
 
+## 사용법
+
+- Extensions 로 바꾼 이유는 설치가 쉬워서이다. 특히, FlutterFlow 와 같이 소스 코드를 전혀 모르고도 개발을 할 수 있도록 하는 툴들이 많은데, 도움이 될 것이라 생각한다.
+
+- 클라우드 함수를 설치하는 것과 Extensions 으로 클라우드 함수를 설치하는 것에 대한 차이를 이해 할 필요가 있다.
+  - Extensions 으로 설치하면,
+    - 동일한 함수를 여러개 설치 할 수 있다.
+    - 그리고 함수 앞에 `ext-[name]-` 이 붙는다. 예를 들어 extensions 이름이 fff 이고, 함수 이름이 abc 이면, `ext-fff-abc` 와 같이 된다. 그러나 이 형식은 extension 이 맨 처음 한번만 설치될 때 그렇고, 동일한 extensions 가 여러번 설치되면, `ext-[name]-[n]-` 와 같이 설치되는 함수 이름이 달라진다.
+    - extensions 이 중복으로 설치될 때, Event trigger 형식의 함수라면 상관이 없지만, `callable` 함수나 `http rest api` 형식의 함수라면 호출하는 endpoint 가 달라져야 하므로  주의 한다.
+      - 예를 들어 on call 함수의 경우, 소스 코드의 함수 이름은 `abc` 이지만, 호출 할 때에는 `ext-fff-abc` 와 같이 호출을 해야 한다. 이러한 것들이 클라우드 함수로 설치할 때와 다른 점인데, 알아 둘 필요가 있다.
+
+
+
+
 ## API of FireFlutter Extensions
 
 ### 푸시 전송 로직
@@ -186,8 +200,9 @@ You can get the endpoint of the API from your Firebase console.
 
 - 채팅방에 입장을 하려고 할 때, 채팅방 설정에 비밀번호가 있으면, security rules 에 의해서 client end 에서 join 을 못한다.
 - `chatJoinWithPassword` 함수를 통해서 join 을 할 수 있다.
-
-
+- 클라이언트에서 on call 함수를 호출 할 때, 함수명을 extensions name 을 뜻하는 `ext-fff-` 를 앞에 붙여서 `ext-fff-chatJoinWithPassword` 와 같이 해야 한다.
+  - Firebase Extensions 은 동일한 extensions 을 여러번 설치할 수 있는데 설치할 때, instance id 가 달라진다. 즉, 두번 째, fireflutter extensions 을 설치하면, 함수 이름이 `ext-fff-chatJoinWithPassword` 아닌, 다른 함수 이름으로 된다. 따라서, 여러개의 fireflutter exstensions 를 설치해도 맨 처음 설치한 `ext-fff-chatJoinWithPassword` 만 호출 될 수 있으므로 주의한다.
+  
 
 
 ## Knwon issues
