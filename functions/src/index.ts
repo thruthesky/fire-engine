@@ -21,9 +21,9 @@ setGlobalOptions({
 export * from "./chat/chat.functions";
 export * from "./comment/comment.functions";
 export * from "./etc/etc.functions";
-export * from "./link/link.functions";
 export * from "./messaging/messaging.functions";
 export * from "./post/post.functions";
 export * from "./user/user.functions";
+export * from "./link/link.functions";
 
 
