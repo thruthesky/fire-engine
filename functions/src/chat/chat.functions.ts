@@ -1,14 +1,15 @@
 
 
-import {ChatService} from "./chat.service";
-import {dog} from "../library";
-import {onCall} from "firebase-functions/v2/https";
+import { ChatService } from "./chat.service";
+import { dog } from "../library";
+import { onCall } from "firebase-functions/v2/https";
 
 
-import {MessagingService} from "../messaging/messaging.service";
+import { MessagingService } from "../messaging/messaging.service";
 
-import {ChatCreateEvent} from "./chat.interface";
-import {onValueCreated} from "firebase-functions/v2/database";
+import { ChatCreateEvent } from "./chat.interface";
+import { onValueCreated } from "firebase-functions/v2/database";
+import { Config } from "../config";
 
 
 /**
@@ -41,9 +42,12 @@ export const chatJoinWithPassword = onCall(async (request) => {
  *
  */
 export const sendMessagesToChatRoomSubscribers = onValueCreated(
-    "/chat-messages/{room}/{id}",
+    {
+        ref: "/chat-messages/{room}/{id}",
+        region: Config.rtdbRegion,
+    },
     async (event) => {
-    // Grab the current value of what was written to the Realtime Database.
+        // Grab the current value of what was written to the Realtime Database.
         const data: ChatCreateEvent = {
             ...event.data.val(),
             id: event.params.id,

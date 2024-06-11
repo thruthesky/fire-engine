@@ -9,7 +9,7 @@
  */
 
 import * as admin from "firebase-admin";
-import {setGlobalOptions} from "firebase-functions/v2";
+import { setGlobalOptions } from "firebase-functions/v2";
 
 admin.initializeApp();
 
@@ -20,7 +20,7 @@ setGlobalOptions({
 
 export * from "./chat/chat.functions";
 export * from "./comment/comment.functions";
-export * from "./etc/etc.functions";
+// export * from "./etc/etc.functions";
 export * from "./messaging/messaging.functions";
 export * from "./post/post.functions";
 export * from "./user/user.functions";

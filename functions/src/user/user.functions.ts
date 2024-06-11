@@ -1,10 +1,10 @@
 import * as functions from "firebase-functions";
-import {Config} from "../config";
-import {dog, isCreate, isDelete, isUpdate} from "../library";
+import { Config } from "../config";
+import { dog, isCreate, isDelete, isUpdate } from "../library";
 
-import {ServerValue, getDatabase} from "firebase-admin/database";
-import {MessagingService} from "../messaging/messaging.service";
-import {DataSnapshot, DatabaseEvent, onValueWritten} from "firebase-functions/v2/database";
+import { ServerValue, getDatabase } from "firebase-admin/database";
+import { MessagingService } from "../messaging/messaging.service";
+import { DataSnapshot, DatabaseEvent, onValueWritten } from "firebase-functions/v2/database";
 
 
 // phoneNumberRegister
@@ -20,7 +20,10 @@ import {DataSnapshot, DatabaseEvent, onValueWritten} from "firebase-functions/v2
  *
  */
 export const userLike =
-    onValueWritten(`${Config.whoILike}/{myUid}/{targetUid}`,
+    onValueWritten({
+        ref: `${Config.whoILike}/{myUid}/{targetUid}`,
+        region: Config.rtdbRegion,
+    },
         async (event: DatabaseEvent<functions.Change<DataSnapshot>>) => {
             const change = event.data;
             const params = event.params;
@@ -35,13 +38,13 @@ export const userLike =
             // created or updated
             if (isCreate(change) || isUpdate(change)) {
                 dog("-- userLike; create or update;");
-                await db.ref(`${Config.whoLikeMe}/${targetUid}`).update({[myUid]: true});
-                await db.ref(`users/${targetUid}`).update({noOfLikes: ServerValue.increment(1)});
+                await db.ref(`${Config.whoLikeMe}/${targetUid}`).update({ [myUid]: true });
+                await db.ref(`users/${targetUid}`).update({ noOfLikes: ServerValue.increment(1) });
             } else if (isDelete(change)) {
                 dog("-- userLike; delete;");
                 // deleted
                 await db.ref(`${Config.whoLikeMe}/${targetUid}/${myUid}`).remove();
-                await db.ref(`users/${targetUid}`).update({noOfLikes: ServerValue.increment(-1)});
+                await db.ref(`users/${targetUid}`).update({ noOfLikes: ServerValue.increment(-1) });
             }
 
 
