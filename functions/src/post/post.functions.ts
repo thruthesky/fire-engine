@@ -8,8 +8,15 @@
 // import { getDatabase } from "firebase-admin/database";
 import * as functions from "firebase-functions";
 import {Config} from "../config";
-import {isCreate, isDelete, isUpdate} from "../library";
+import {isCreate, isDelete, isUpdate, strcut} from "../library";
 import {PostService} from "./post.service";
+
+
+import {onValueCreated} from "firebase-functions/v2/database";
+
+import {PostCreateEvent} from "./post.interface";
+import {PostCreateMessage} from "../messaging/messaging.interfaces";
+import {MessagingService} from "../messaging/messaging.service";
 
 
 /**
@@ -26,4 +33,29 @@ export const postSummaries = functions.database.ref(`${Config.posts}/{category}/
             await PostService.deleteSummary(context.params.category, context.params.postId);
         }
     });
+
+
+/**
+ * 게시판(카테고리) 구독자들에게 메시지 전송
+ *
+ * 새 글이 작성되면 메시지를 전송한다.
+ */
+export const sendMessagesToCategorySubscribers = onValueCreated(
+    `${Config.posts}/{category}/{id}`,
+    async (event) => {
+        // Grab the current value of what was written to the Realtime Database.
+        const data = event.data.val() as PostCreateEvent;
+
+        const post: PostCreateMessage = {
+            id: event.params.id,
+            category: event.params.category,
+            title: strcut(data.title ?? "", 64),
+            body: strcut(data.content ?? "", 100),
+            uid: data.uid,
+            image: data.urls?.[0] ?? "",
+        };
+
+        return await MessagingService.sendMessagesToCategorySubscribers(post);
+    });
+
 
