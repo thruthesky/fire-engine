@@ -1,38 +1,26 @@
 
+import {AndroidConfig, ApnsConfig, FcmOptions, WebpushConfig} from "firebase-admin/messaging";
+
 
 /**
- * Interface for sending multiple messages with multiple tokens.
+ * Basic interface for sending a message
  *
- * @title: Title of the message
- * @body: Body of the message
- * @tokens: Array of tokens to send the message to
- * @data: Additional data to be sent
+ * Note that, the image is optional and is not the required field for sending a message
  */
-export interface SendMultiMessages {
+export interface MessageNotification {
     title: string;
     body: string;
-    tokens: string | string[];
-    data?: { [key: string]: unknown };
-    shortErrorMessage?: boolean;
-    maxConcurrent?: number;
+    image?: string;
 }
 
 /**
- * Interface for sending a single message
  *
- * @title: Title of the message
- * @body: Body of the message
- * @token: Token to send the message to
- * @data: Additional data to be sent
  */
-export interface SendOneMessage {
-    title: string;
-    body: string;
-    token: string;
-    data?: { [key: string]: unknown };
-    accessToken: string;
-    shortErrorMessage?: boolean;
+export interface MessageRequest extends MessageNotification {
+    tokens: Array<string>;
+    data?: { [key: string]: string };
 }
+
 
 /**
  * Interface for sending message when a user likes another user
@@ -57,4 +45,24 @@ export interface NotificationToUids {
     body: string;
     data?: { [key: string]: unknown };
 }
+
+
+/**
+ * Interface for push notification payload.
+ */
+export interface MessagePayload {
+    notification: MessageNotification;
+    data: {
+        [key: string]: string;
+    };
+    token: string;
+    success?: boolean;
+    code?: string;
+
+    android?: AndroidConfig;
+    webpush?: WebpushConfig;
+    apns?: ApnsConfig;
+    fcmOptions?: FcmOptions;
+}
+
 
