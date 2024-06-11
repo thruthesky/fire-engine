@@ -1,13 +1,14 @@
-import {SendResponse, getMessaging} from "firebase-admin/messaging";
-import {MessageNotification, MessagePayload, MessageRequest, NotificationToUids, PostCreateMessage, UserLikeEvent} from "./messaging.interfaces";
-import {getDatabase} from "firebase-admin/database";
-import {Config} from "../config";
-import {chunk} from "../library";
-import {CommentCreateMessage} from "../comment/comment.interfaces";
-import {PostService} from "../post/post.service";
-import {CommentService} from "../comment/comment.service";
-import {UserService} from "../user/user.service";
-import {ChatCreateEvent} from "../chat/chat.interface";
+import { SendResponse, getMessaging } from "firebase-admin/messaging";
+import { MessageNotification, MessagePayload, MessageRequest, NotificationToUids, PostCreateMessage, UserLikeEvent } from "./messaging.interfaces";
+import { getDatabase } from "firebase-admin/database";
+import { Config } from "../config";
+import { chunk } from "../library";
+import { CommentCreateMessage } from "../comment/comment.interfaces";
+import { PostService } from "../post/post.service";
+import { CommentService } from "../comment/comment.service";
+import { UserService } from "../user/user.service";
+import { ChatCreateEvent } from "../chat/chat.interface";
+import { T } from "../texts";
 
 
 /* eslint-disable valid-jsdoc */
@@ -93,7 +94,7 @@ export class MessagingService {
 
 
         // Image is optional
-        const notification: MessageNotification = {title: params.title, body: params.body};
+        const notification: MessageNotification = { title: params.title, body: params.body };
         if (params.image) {
             notification["image"] = params.image;
         }
@@ -201,7 +202,7 @@ export class MessagingService {
     static async sendNotificationToUids(req: NotificationToUids)
         : Promise<string | void> {
         // prepare the parameters
-        let {uids, chunkSize, title, body, image, data} = req;
+        let { uids, chunkSize, title, body, image, data } = req;
         data = data ?? {};
         chunkSize = chunkSize ?? 500;
 
@@ -212,7 +213,7 @@ export class MessagingService {
         Config.log("----> sendNotificationToUids() -> tokenChunks:", tokenChunks);
 
         // 토큰 메시지 작성. 이미지는 옵션.
-        const notification: MessageNotification = {title, body};
+        const notification: MessageNotification = { title, body };
         if (image) {
             notification["image"] = image;
         }
@@ -392,8 +393,11 @@ export class MessagingService {
      */
     static async sendMessageWhenUserLikeMe(event: UserLikeEvent) {
         const user = await UserService.get(event.receiverUid);
-        const title = `${user.displayName} liked you.`;
-        const body = `Please say Hi to ${user.displayName}.`;
+        // const title = `${user.displayName} liked you.`;
+        // const body = `Please say Hi to ${user.displayName}.`;
+        const title = T.likeFcmTitle(langaugeCode, displayName);
+        const body = T.likeFcmBody(langaugeCode, displayName);
+
         await this.sendNotificationToUids({
             uids: [event.senderUid], chunkSize: 256, title, body, image: user.photoUrl, data: {
                 senderUid: event.senderUid,
