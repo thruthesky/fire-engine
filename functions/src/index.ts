@@ -24,5 +24,6 @@ export * from "./etc/etc.functions";
 export * from "./messaging/messaging.functions";
 export * from "./post/post.functions";
 export * from "./user/user.functions";
+export * from "./link/link.functions";
 
 
