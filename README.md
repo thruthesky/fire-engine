@@ -1,7 +1,4 @@
-# Fireflutter Extension
-
-- 버그 레포팅 해 놓았다. Extensions 에서 security account 권한 부여 없이, http v1 을 통한 fcm 을 보낼 수 있으면 계속 작업을 한다. 즉, exstension 설치많으로 간편히 된다. 하지만, security account 를 부여해야한다면, 즉, extensions 에서 fcm 보낼 수 없다면,
-  - 그냥 cloud functions 만으로 작업을 한다.
+# Fireflutter Functions
 
 
 - This extension simplifies the installation and management of Firebase Cloud Functions required by FireFlutter.
