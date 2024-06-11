@@ -1,7 +1,8 @@
 
 import * as functions from "firebase-functions";
-import {ChatService} from "./chat.service";
-import {dog} from "../library";
+import { ChatService } from "./chat.service";
+import { dog } from "../library";
+import { onCall } from "firebase-functions/v2/https";
 
 /**
  * Check password
@@ -10,6 +11,8 @@ import {dog} from "../library";
  * 즉, data 는 클라이언트가 전달하는 그대로의 값을 가지고 있다. 클라이언트가 boolean 전달하면,
  * data 는 그 자체로 boolean 값이 되고, number 를 전달하면, number 가 되고, object 를 전달하면
  * object 가 된다.
+ * 
+ * TODO - convert this into Gen2
  */
 export const chatJoinWithPassword = functions.https.onCall(async (data, context) => {
     dog("chatJoinWithPassword() begins with;", data);
@@ -17,3 +20,18 @@ export const chatJoinWithPassword = functions.https.onCall(async (data, context)
     dog("result;", re);
     return re;
 });
+
+
+
+/**
+ * Check password of Gen2
+ * 
+ * This is not tested.
+ */
+export const chatJoinWithPasswordGen2 = onCall(async (request) => {
+    dog("chatJoinWithPassword() begins with;", request.data);
+    const re = await ChatService.joinWithPassword(request.data.roomId, request.data.password, request?.auth?.uid ?? "");
+    dog("result;", re);
+    return re;
+});
+
