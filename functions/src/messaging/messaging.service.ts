@@ -444,8 +444,9 @@ export class MessagingService {
                 uids.push(child.key!);
             }
         });
-        Config.log("-----> sendMessagesToChatRoomSubscribers uids:", uids);
 
+        //
+        Config.log("-----> sendMessagesToChatRoomSubscribers uids:", uids);
 
         // Remove my uid from the list of uids to NOT receive the message from myself.
         // @withcenter-dev2 : double check this logic
