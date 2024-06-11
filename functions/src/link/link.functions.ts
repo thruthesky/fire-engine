@@ -2,9 +2,9 @@
 
 import * as functions from "firebase-functions";
 import * as express from "express";
-import { getFirestore, DocumentSnapshot } from "firebase-admin/firestore";
-import { AndroidCredential, AppleCredential } from "./link.interface";
-import { DataSnapshot, getDatabase } from "firebase-admin/database";
+import {getFirestore, DocumentSnapshot} from "firebase-admin/firestore";
+import {AndroidCredential, AppleCredential} from "./link.interface";
+import {DataSnapshot, getDatabase} from "firebase-admin/database";
 
 // Initialize Express app
 export const expressApp = express();
@@ -120,9 +120,9 @@ const defaultHtml = `<!DOCTYPE html>
  * @return {Promise<DocumentSnapshot>}
  */
 async function getDeeplinkDoc(docId: string): Promise<DocumentSnapshot> {
-  const db = getFirestore();
-  const docSnap = await db.collection("_link_").doc(docId).get();
-  return docSnap;
+    const db = getFirestore();
+    const docSnap = await db.collection("_link_").doc(docId).get();
+    return docSnap;
 }
 
 /**
@@ -133,9 +133,9 @@ async function getDeeplinkDoc(docId: string): Promise<DocumentSnapshot> {
  *
  */
 async function getRtdbSnapshot(path: string): Promise<DataSnapshot> {
-  const db = getDatabase();
-  const docSnap = await db.ref(path).get();
-  return docSnap;
+    const db = getDatabase();
+    const docSnap = await db.ref(path).get();
+    return docSnap;
 }
 
 /**
@@ -148,15 +148,15 @@ async function getRtdbSnapshot(path: string): Promise<DataSnapshot> {
  * @return {Promise}
  */
 async function getPreview(uid: string, pid: string, cid: string): Promise<{ [key: string]: string }> {
-  console.log("---> begin getPreview()", pid, uid, cid);
-  if (pid) return await getPostPreview(pid);
-  if (uid) return await getUserPreview(uid);
-  if (cid) return await getChatPreview(cid);
-  return {
-    title: "Empty ID",
-    description: "The ID is empty! Please provide a valid ID of post, user or chat room.",
-    imageUrl: "https://via.placeholder.com/150",
-  };
+    console.log("---> begin getPreview()", pid, uid, cid);
+    if (pid) return await getPostPreview(pid);
+    if (uid) return await getUserPreview(uid);
+    if (cid) return await getChatPreview(cid);
+    return {
+        title: "Empty ID",
+        description: "The ID is empty! Please provide a valid ID of post, user or chat room.",
+        imageUrl: "https://via.placeholder.com/150",
+    };
 }
 
 /**
@@ -166,24 +166,24 @@ async function getPreview(uid: string, pid: string, cid: string): Promise<{ [key
  * @return {Promise}
  */
 async function getPostPreview(pid: string): Promise<{ [key: string]: string }> {
-  // TODO for confirmation:
-  // In RTDB, the cost is based on the data transfered not per read.
-  // In this code, the snapshot is getitng all the details under the post.
-  // Will it be better if we get value one by one?
-  const docSnap = await getRtdbSnapshot(`post-all-summaries/${pid}`);
-  if (docSnap.exists()) {
-    const post = docSnap.val();
-    const data = {} as { [key: string]: string };
-    if (post.title) data["title"] = post.title;
-    if (post.content) data["description"] = post.content;
-    if (post.url) data["imageUrl"] = post.url;
-    return data;
-  } else {
-    return {
-      title: "Post does not exsist!",
-      description: "Post Not exists!",
-    };
-  }
+    // TODO for confirmation:
+    // In RTDB, the cost is based on the data transfered not per read.
+    // In this code, the snapshot is getitng all the details under the post.
+    // Will it be better if we get value one by one?
+    const docSnap = await getRtdbSnapshot(`post-all-summaries/${pid}`);
+    if (docSnap.exists()) {
+        const post = docSnap.val();
+        const data = {} as { [key: string]: string };
+        if (post.title) data["title"] = post.title;
+        if (post.content) data["description"] = post.content;
+        if (post.url) data["imageUrl"] = post.url;
+        return data;
+    } else {
+        return {
+            title: "Post does not exsist!",
+            description: "Post Not exists!",
+        };
+    }
 }
 
 /**
@@ -193,20 +193,20 @@ async function getPostPreview(pid: string): Promise<{ [key: string]: string }> {
  * @return {Promise}
  */
 async function getUserPreview(uid: string): Promise<{ [key: string]: string }> {
-  const docSnap = await getRtdbSnapshot(`users/${uid}`);
-  if (docSnap.exists()) {
-    const user = docSnap.val();
-    const data = {} as { [key: string]: string };
-    if (user.displayName) data["title"] = user.displayName;
-    if (user.stateMessage) data["description"] = user.stateMessage;
-    if (user.photoUrl) data["imageUrl"] = user.photoUrl;
-    return data;
-  } else {
-    return {
-      title: "User does not exsist!",
-      description: "User Not exists!",
-    };
-  }
+    const docSnap = await getRtdbSnapshot(`users/${uid}`);
+    if (docSnap.exists()) {
+        const user = docSnap.val();
+        const data = {} as { [key: string]: string };
+        if (user.displayName) data["title"] = user.displayName;
+        if (user.stateMessage) data["description"] = user.stateMessage;
+        if (user.photoUrl) data["imageUrl"] = user.photoUrl;
+        return data;
+    } else {
+        return {
+            title: "User does not exsist!",
+            description: "User Not exists!",
+        };
+    }
 }
 
 /**
@@ -216,72 +216,72 @@ async function getUserPreview(uid: string): Promise<{ [key: string]: string }> {
  * @return { Promise }
  */
 async function getChatPreview(cid: string): Promise<{ [key: string]: string }> {
-  const docSnap = await getRtdbSnapshot(`chat-rooms/${cid}`);
-  if (docSnap.exists()) {
-    const chatRoom = docSnap.val();
-    const data = {} as { [key: string]: string };
-    if (chatRoom.name) data["title"] = chatRoom.name;
-    if (chatRoom.description) data["description"] = chatRoom.description;
-    if (chatRoom.iconUrl) data["imageUrl"] = chatRoom.iconUrl;
-    return data;
-  } else {
-    return {
-      title: "Chat room does not exsist!",
-      description: "Chat Room Not Exists!",
-    };
-  }
+    const docSnap = await getRtdbSnapshot(`chat-rooms/${cid}`);
+    if (docSnap.exists()) {
+        const chatRoom = docSnap.val();
+        const data = {} as { [key: string]: string };
+        if (chatRoom.name) data["title"] = chatRoom.name;
+        if (chatRoom.description) data["description"] = chatRoom.description;
+        if (chatRoom.iconUrl) data["imageUrl"] = chatRoom.iconUrl;
+        return data;
+    } else {
+        return {
+            title: "Chat room does not exsist!",
+            description: "Chat Room Not Exists!",
+        };
+    }
 }
 
 
 expressApp.get("/.well-known/apple-app-site-association", async (req, res) => {
-  const docSnaphot = await getDeeplinkDoc("ios");
-  res.writeHead(200, { "Content-Type": "application/json" });
-  if (docSnaphot.exists) {
-    const snapshotData: AppleCredential = docSnaphot.data() as AppleCredential;
-    const applinkDetails = snapshotData.apps.map((teamIDAndAppIBundled) => ({
-      appID: teamIDAndAppIBundled,
-      paths: ["*"],
-      // appIDs: [teamIDAndAppIBundled],
-    }));
-    const webCredentials = snapshotData.apps.map((teamIDAndAppIBundled) => (
-      teamIDAndAppIBundled
-    ));
-    const appsSiteAssociation = {
-      applinks: {
-        // apps: [],
-        details: applinkDetails,
-      },
-      webCredentials: {
-        apps: webCredentials,
-      },
-    };
-    res.write(JSON.stringify(appsSiteAssociation));
-  } else {
+    const docSnaphot = await getDeeplinkDoc("ios");
+    res.writeHead(200, {"Content-Type": "application/json"});
+    if (docSnaphot.exists) {
+        const snapshotData: AppleCredential = docSnaphot.data() as AppleCredential;
+        const applinkDetails = snapshotData.apps.map((teamIDAndAppIBundled) => ({
+            appID: teamIDAndAppIBundled,
+            paths: ["*"],
+            // appIDs: [teamIDAndAppIBundled],
+        }));
+        const webCredentials = snapshotData.apps.map((teamIDAndAppIBundled) => (
+            teamIDAndAppIBundled
+        ));
+        const appsSiteAssociation = {
+            applinks: {
+                // apps: [],
+                details: applinkDetails,
+            },
+            webCredentials: {
+                apps: webCredentials,
+            },
+        };
+        res.write(JSON.stringify(appsSiteAssociation));
+    } else {
     // docSnap.data() will be undefined in this case
-    res.write("Page not found!");
-  }
-  res.end();
+        res.write("Page not found!");
+    }
+    res.end();
 });
 
 expressApp.get("/.well-known/assetlinks.json", async (req, res) => {
-  const docSnaphot = await getDeeplinkDoc("android");
-  res.writeHead(200, { "Content-Type": "application/json" });
-  if (docSnaphot.exists) {
-    const snapshotData: AndroidCredential = docSnaphot.data() as AndroidCredential;
-    const jsonCredentials = Object.entries(snapshotData).map(([appName, sha256s]) => ({
-      relation: ["delegate_permission/common.handle_all_urls"],
-      target: {
-        namespace: "android_app",
-        package_name: appName,
-        sha256_cert_fingerprints: sha256s.map((sha) => sha.toUpperCase()),
-      },
-    }));
-    res.write(JSON.stringify(jsonCredentials));
-  } else {
+    const docSnaphot = await getDeeplinkDoc("android");
+    res.writeHead(200, {"Content-Type": "application/json"});
+    if (docSnaphot.exists) {
+        const snapshotData: AndroidCredential = docSnaphot.data() as AndroidCredential;
+        const jsonCredentials = Object.entries(snapshotData).map(([appName, sha256s]) => ({
+            relation: ["delegate_permission/common.handle_all_urls"],
+            target: {
+                namespace: "android_app",
+                package_name: appName,
+                sha256_cert_fingerprints: sha256s.map((sha) => sha.toUpperCase()),
+            },
+        }));
+        res.write(JSON.stringify(jsonCredentials));
+    } else {
     // docSnap.data() will be undefined in this case
-    res.write("Page not found!");
-  }
-  res.end();
+        res.write("Page not found!");
+    }
+    res.end();
 });
 
 
@@ -289,44 +289,44 @@ expressApp.get("/.well-known/assetlinks.json", async (req, res) => {
  * This method is called on all access under `/link` url.
  */
 expressApp.get("*", async (req, res) => {
-  let html = defaultHtml;
-  let previewDetails;
+    let html = defaultHtml;
+    let previewDetails;
 
-  // Prepare the content
-  const app = (req.query.app ?? "") as string;
-  const path = (req.query.path ?? "") as string;
-
-
-  // Get app data
-  const snapshot = await getDeeplinkDoc("apps");
-  if (!snapshot.exists) {
-    return res.send("/_link_/app document not found! Please create one.");
-  }
-  const map = snapshot.data() as { [key: string]: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
-  let appData: { [key: string]: string } = map["default"];
-  if (app && map[app]) {
-    appData = map[app];
-  }
+    // Prepare the content
+    const app = (req.query.app ?? "") as string;
+    const path = (req.query.path ?? "") as string;
 
 
-  // Get the preview details
-  if (path) {
-    previewDetails = {};
-  } else {
-    previewDetails = await getPreview((req.query.uid ?? "") as string, (req.query.pid ?? "") as string, (req.query.cid ?? "") as string);
-  }
-  appData = {
-    ...appData,
-    ...previewDetails,
-    query: new URLSearchParams(req.query as any).toString(), // eslint-disable-line @typescript-eslint/no-explicit-any
-  };
+    // Get app data
+    const snapshot = await getDeeplinkDoc("apps");
+    if (!snapshot.exists) {
+        return res.send("/_link_/app document not found! Please create one.");
+    }
+    const map = snapshot.data() as { [key: string]: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
+    let appData: { [key: string]: string } = map["default"];
+    if (app && map[app]) {
+        appData = map[app];
+    }
 
-  console.log("---> appData", appData);
 
-  for (const key of Object.keys(appData)) {
-    html = html.replaceAll(`#{{${key}}}`, appData[key]);
-  }
+    // Get the preview details
+    if (path) {
+        previewDetails = {};
+    } else {
+        previewDetails = await getPreview((req.query.uid ?? "") as string, (req.query.pid ?? "") as string, (req.query.cid ?? "") as string);
+    }
+    appData = {
+        ...appData,
+        ...previewDetails,
+        query: new URLSearchParams(req.query as any).toString(), // eslint-disable-line @typescript-eslint/no-explicit-any
+    };
 
-  // Return the webpage
-  return res.send(html);
+    console.log("---> appData", appData);
+
+    for (const key of Object.keys(appData)) {
+        html = html.replaceAll(`#{{${key}}}`, appData[key]);
+    }
+
+    // Return the webpage
+    return res.send(html);
 });

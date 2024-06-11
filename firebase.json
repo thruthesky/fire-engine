@@ -16,6 +16,25 @@
       ]
     }
   ],
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "appAssociation": "NONE",
+    "rewrites": [
+      {
+        "source": "/link{,/**}",
+        "function": "link"
+      },
+      {
+        "source": "/.well-known/**",
+        "function": "link"
+      }
+    ]
+  },
   "emulators": {
     "functions": {
       "port": 5001
