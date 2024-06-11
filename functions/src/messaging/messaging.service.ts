@@ -1,12 +1,13 @@
-import {SendResponse, getMessaging} from "firebase-admin/messaging";
-import {MessageNotification, MessagePayload, MessageRequest, NotificationToUids, PostCreateMessage, UserLikeEvent} from "./messaging.interfaces";
-import {getDatabase} from "firebase-admin/database";
-import {Config} from "../config";
-import {chunk} from "../library";
-import {CommentCreateMessage} from "../comment/comment.interfaces";
-import {PostService} from "../post/post.service";
-import {CommentService} from "../comment/comment.service";
-import {UserService} from "../user/user.service";
+import { SendResponse, getMessaging } from "firebase-admin/messaging";
+import { MessageNotification, MessagePayload, MessageRequest, NotificationToUids, PostCreateMessage, UserLikeEvent } from "./messaging.interfaces";
+import { getDatabase } from "firebase-admin/database";
+import { Config } from "../config";
+import { chunk } from "../library";
+import { CommentCreateMessage } from "../comment/comment.interfaces";
+import { PostService } from "../post/post.service";
+import { CommentService } from "../comment/comment.service";
+import { UserService } from "../user/user.service";
+import { ChatCreateEvent } from "../chat/chat.interface";
 
 
 /* eslint-disable valid-jsdoc */
@@ -92,7 +93,7 @@ export class MessagingService {
 
 
         // Image is optional
-        const notification: MessageNotification = {title: params.title, body: params.body};
+        const notification: MessageNotification = { title: params.title, body: params.body };
         if (params.image) {
             notification["image"] = params.image;
         }
@@ -200,7 +201,7 @@ export class MessagingService {
     static async sendNotificationToUids(req: NotificationToUids)
         : Promise<string | void> {
         // prepare the parameters
-        let {uids, chunkSize, title, body, image, data} = req;
+        let { uids, chunkSize, title, body, image, data } = req;
         data = data ?? {};
         chunkSize = chunkSize ?? 500;
 
@@ -211,7 +212,7 @@ export class MessagingService {
         Config.log("----> sendNotificationToUids() -> tokenChunks:", tokenChunks);
 
         // 토큰 메시지 작성. 이미지는 옵션.
-        const notification: MessageNotification = {title, body};
+        const notification: MessageNotification = { title, body };
         if (image) {
             notification["image"] = image;
         }
@@ -401,6 +402,70 @@ export class MessagingService {
             targetId: event.receiverUid,
         });
     }
+
+
+
+
+    /**
+     * 채팅 메시지가 전송되면, 해당 채팅방 사용자들에게 메시지를 전송한다.
+     *
+     * @param msg 채팅 메시지 정보
+     */
+    static async sendMessagesToChatRoomSubscribers(msg: ChatCreateEvent) {
+        const db = getDatabase();
+
+        Config.log("-----> sendMessagesToChatRoomSubscribers msg:", msg);
+
+        // Get the uids of the room users who have subscribed.
+        //
+        // 구독 한 사용자의 목록을 가져온다. 구독하지 않은 사용자 정보는 가져오지 않는다.
+        const snapshot = await db.ref(`chat-rooms/${msg.roomId}/users`).orderByValue().equalTo(true).get();
+
+        //
+        let uids: Array<string> = [];
+        snapshot.forEach((child) => {
+            // Don't send the message to myself.
+            if (child.key != msg.uid) {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                uids.push(child.key!);
+            }
+        });
+        Config.log("-----> sendMessagesToChatRoomSubscribers uids:", uids);
+
+
+        // Remove my uid from the list of uids to NOT receive the message from myself.
+        // @withcenter-dev2 : double check this logic
+        uids = uids.filter((uid) => uid != msg.uid);
+
+
+        // 그룹 채팅이면, 그룹 채팅방 이름과 사용자 이름을 표시한다.
+        let displayName = "";
+        if (msg.roomId.indexOf("---") == -1) {
+            const snap = await db.ref(`chat-rooms/${msg.roomId}/name`).get();
+
+            displayName += snap.val() ?? "그룹 챗";
+            displayName += " - ";
+        }
+
+        // 사용자 이름. 만약 사용자 이름이 없으면 "챗 메시지"로 표시한다.
+        const snap = await db.ref(`users/${msg.uid}/displayName`).get();
+        displayName += snap.val() ?? "챗 메시지";
+
+        const title = `${displayName}`;
+
+        // 사진을 업로드하면??
+        const body = msg.text ?? "사진을 업로드하였습니다.";
+
+        // 메시지를 전송한다.
+        await this.sendNotificationToUids({
+            uids, chunkSize: 256, title, body, image: msg.url, data: {
+                senderUid: msg.uid, messageId: msg.id, roomId: msg.roomId,
+            },
+            action: "chat",
+            targetId: msg.roomId,
+        });
+    }
+
 }
 
 
