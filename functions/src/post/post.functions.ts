@@ -24,14 +24,14 @@ import {Change} from "firebase-functions/v1";
  * Post write 이벤트가 발생하면, 해당 포스트의 요약 정보를 업데이트 한다.
  */
 export const postSummaries = onValueWritten(
-  `${Config.posts}/{category}/{postId}`,
-  async (event: DatabaseEvent<Change<DataSnapshot>>) => {
-    if (isCreate(event.data) || isUpdate(event.data)) {
-      await PostService.setSummary(event.data.after.val(), event.params.category, event.params.postId);
-    } else if (isDelete(event.data)) {
-      await PostService.deleteSummary(event.params.category, event.params.postId);
-    }
-  },
+    `${Config.posts}/{category}/{postId}`,
+    async (event: DatabaseEvent<Change<DataSnapshot>>) => {
+        if (isCreate(event.data) || isUpdate(event.data)) {
+            await PostService.setSummary(event.data.after.val(), event.params.category, event.params.postId);
+        } else if (isDelete(event.data)) {
+            await PostService.deleteSummary(event.params.category, event.params.postId);
+        }
+    },
 );
 
 // export const postSummaries = functions.database.ref(`${Config.posts}/{category}/{postId}`)
@@ -53,21 +53,21 @@ export const postSummaries = onValueWritten(
  * 새 글이 작성되면 메시지를 전송한다.
  */
 export const sendMessagesToCategorySubscribers = onValueCreated(
-  `${Config.posts}/{category}/{id}`,
-  async (event) => {
+    `${Config.posts}/{category}/{id}`,
+    async (event) => {
     // Grab the current value of what was written to the Realtime Database.
-    const data = event.data.val() as PostCreateEvent;
+        const data = event.data.val() as PostCreateEvent;
 
-    const post: PostCreateMessage = {
-      id: event.params.id,
-      category: event.params.category,
-      title: strcut(data.title ?? "", 64),
-      body: strcut(data.content ?? "", 100),
-      uid: data.uid,
-      image: data.urls?.[0] ?? "",
-    };
+        const post: PostCreateMessage = {
+            id: event.params.id,
+            category: event.params.category,
+            title: strcut(data.title ?? "", 64),
+            body: strcut(data.content ?? "", 100),
+            uid: data.uid,
+            image: data.urls?.[0] ?? "",
+        };
 
-    return await MessagingService.sendMessagesToCategorySubscribers(post);
-  });
+        return await MessagingService.sendMessagesToCategorySubscribers(post);
+    });
 
 

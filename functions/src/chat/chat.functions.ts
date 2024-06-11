@@ -41,14 +41,14 @@ export const chatJoinWithPassword = onCall(async (request) => {
  *
  */
 export const sendMessagesToChatRoomSubscribers = onValueCreated(
-  "/chat-messages/{room}/{id}",
-  async (event) => {
+    "/chat-messages/{room}/{id}",
+    async (event) => {
     // Grab the current value of what was written to the Realtime Database.
-    const data: ChatCreateEvent = {
-      ...event.data.val(),
-      id: event.params.id,
-      roomId: event.params.room,
-    };
+        const data: ChatCreateEvent = {
+            ...event.data.val(),
+            id: event.params.id,
+            roomId: event.params.room,
+        };
 
-    await MessagingService.sendMessagesToChatRoomSubscribers(data);
-  });
+        await MessagingService.sendMessagesToChatRoomSubscribers(data);
+    });

@@ -6,18 +6,18 @@ import {logger} from "firebase-functions/v2";
  * 토큰을 입력받아서 메시지를 전송한다.
  */
 export const sendPushNotifications = onRequest(async (request, response) => {
-  logger.info("request.query of sendPushNotifications", request.body);
-  try {
-    const res = await MessagingService.sendNotificationToTokens(request.body);
-    response.send(res);
-  } catch (e) {
-    logger.error(e);
-    if (e instanceof Error) {
-      response.send({error: e.message});
-    } else {
-      response.send({error: "unknown error"});
+    logger.info("request.query of sendPushNotifications", request.body);
+    try {
+        const res = await MessagingService.sendNotificationToTokens(request.body);
+        response.send(res);
+    } catch (e) {
+        logger.error(e);
+        if (e instanceof Error) {
+            response.send({error: e.message});
+        } else {
+            response.send({error: "unknown error"});
+        }
     }
-  }
 });
 
 
