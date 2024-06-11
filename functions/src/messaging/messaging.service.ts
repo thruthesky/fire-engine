@@ -9,6 +9,7 @@ import { CommentService } from "../comment/comment.service";
 import { UserService } from "../user/user.service";
 import { ChatCreateEvent } from "../chat/chat.interface";
 import { T } from "../texts";
+import { UserSettingService } from "../user-setting/user-setting.service";
 
 
 /* eslint-disable valid-jsdoc */
@@ -395,6 +396,9 @@ export class MessagingService {
         const user = await UserService.get(event.receiverUid);
         // const title = `${user.displayName} liked you.`;
         // const body = `Please say Hi to ${user.displayName}.`;
+
+        const langaugeCode = await UserSettingService.getLanguageCode(event.receiverUid);
+        const displayName = await UserService.getDisplayName(event.senderUid);
         const title = T.likeFcmTitle(langaugeCode, displayName);
         const body = T.likeFcmBody(langaugeCode, displayName);
 
@@ -406,15 +410,13 @@ export class MessagingService {
                 receiverUid: event.receiverUid,
                 senderUid: event.senderUid,
             },
-        };
-
-        await this.sendNotificationToUids({
-            uids: [event.senderUid], chunkSize: 256, title, body, image: user.photoUrl, data: {
-                senderUid: event.senderUid,
-            },
+            chunkSize: 256,
+            image: user.photoUrl,
             action: "like",
             targetId: event.receiverUid,
-        });
+        };
+
+        await this.sendNotificationToUids(data);
     }
 
 
