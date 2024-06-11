@@ -1,5 +1,5 @@
-import {getMessaging} from "firebase-admin/messaging";
-import {MessageNotification, MessagePayload, MessageRequest} from "./messaging.interfaces";
+import { getMessaging } from "firebase-admin/messaging";
+import { MessageNotification, MessagePayload, MessageRequest } from "./messaging.interfaces";
 
 
 /* eslint-disable valid-jsdoc */
@@ -85,7 +85,7 @@ export class MessagingService {
 
 
         // Image is optional
-        const notification: MessageNotification = {title: params.title, body: params.body};
+        const notification: MessageNotification = { title: params.title, body: params.body };
         if (params.image) {
             notification["image"] = params.image;
         }
