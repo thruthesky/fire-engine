@@ -1,6 +1,7 @@
 {
   "projects": {
-    "default": "withcenter-test-3"
+    "default": "withcenter-test-3",
+    "philgo": "philgo"
   },
   "targets": {},
   "etags": {
