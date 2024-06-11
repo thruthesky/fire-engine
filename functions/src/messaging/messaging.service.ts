@@ -398,6 +398,16 @@ export class MessagingService {
         const title = T.likeFcmTitle(langaugeCode, displayName);
         const body = T.likeFcmBody(langaugeCode, displayName);
 
+        const data = {
+            uids: [event.receiverUid],
+            title,
+            body,
+            data: {
+                receiverUid: event.receiverUid,
+                senderUid: event.senderUid,
+            },
+        };
+
         await this.sendNotificationToUids({
             uids: [event.senderUid], chunkSize: 256, title, body, image: user.photoUrl, data: {
                 senderUid: event.senderUid,
