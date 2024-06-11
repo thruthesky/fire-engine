@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 
-import * as functions from "firebase-functions";
+// import * as functions from "firebase-functions/v2";
+import {onRequest} from "firebase-functions/v2/https";
 import * as express from "express";
 import {getFirestore, DocumentSnapshot} from "firebase-admin/firestore";
 import {AndroidCredential, AppleCredential} from "./link.interface";
@@ -10,7 +11,7 @@ import {DataSnapshot, getDatabase} from "firebase-admin/database";
 export const expressApp = express();
 
 // Set up Firebase Cloud Function
-export const link = functions.https.onRequest(expressApp);
+export const link = onRequest(expressApp);
 
 
 const defaultHtml = `<!DOCTYPE html>

@@ -22,10 +22,10 @@ import {onValueCreated} from "firebase-functions/v2/database";
  * TODO - convert this into Gen2
  */
 export const chatJoinWithPassword = functions.https.onCall(async (data, context) => {
-    dog("chatJoinWithPassword() begins with;", data);
-    const re = await ChatService.joinWithPassword(data.roomId, data.password, context?.auth?.uid ?? "");
-    dog("result;", re);
-    return re;
+  dog("chatJoinWithPassword() begins with;", data);
+  const re = await ChatService.joinWithPassword(data.roomId, data.password, context?.auth?.uid ?? "");
+  dog("result;", re);
+  return re;
 });
 
 
@@ -35,10 +35,10 @@ export const chatJoinWithPassword = functions.https.onCall(async (data, context)
  * This is not tested.
  */
 export const chatJoinWithPasswordGen2 = onCall(async (request) => {
-    dog("chatJoinWithPassword() begins with;", request.data);
-    const re = await ChatService.joinWithPassword(request.data.roomId, request.data.password, request?.auth?.uid ?? "");
-    dog("result;", re);
-    return re;
+  dog("chatJoinWithPassword() begins with;", request.data);
+  const re = await ChatService.joinWithPassword(request.data.roomId, request.data.password, request?.auth?.uid ?? "");
+  dog("result;", re);
+  return re;
 });
 
 
@@ -47,14 +47,14 @@ export const chatJoinWithPasswordGen2 = onCall(async (request) => {
  *
  */
 export const sendMessagesToChatRoomSubscribers = onValueCreated(
-    "/chat-messages/{room}/{id}",
-    async (event) => {
-        // Grab the current value of what was written to the Realtime Database.
-        const data: ChatCreateEvent = {
-            ...event.data.val(),
-            id: event.params.id,
-            roomId: event.params.room,
-        };
+  "/chat-messages/{room}/{id}",
+  async (event) => {
+    // Grab the current value of what was written to the Realtime Database.
+    const data: ChatCreateEvent = {
+      ...event.data.val(),
+      id: event.params.id,
+      roomId: event.params.room,
+    };
 
-        await MessagingService.sendMessagesToChatRoomSubscribers(data);
-    });
+    await MessagingService.sendMessagesToChatRoomSubscribers(data);
+  });

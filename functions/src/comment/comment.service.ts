@@ -7,7 +7,7 @@ import {Config} from "../config";
  * CommentService
  */
 export class CommentService {
-    /**
+  /**
      * Get the comment data from the comment id.
      *
      * @param {string} postId post id of the comment
@@ -16,35 +16,35 @@ export class CommentService {
      *
      * 코멘트를 가져오기 위해서는 postId 가 필요하다.
      */
-    static async get(postId: string, commentId: string): Promise<Comment | null> {
-        const db = getDatabase();
-        const data = (await db.ref(`${Config.comments}/${postId}/${commentId}`).get()).val();
-        return data as Comment;
-    }
+  static async get(postId: string, commentId: string): Promise<Comment | null> {
+    const db = getDatabase();
+    const data = (await db.ref(`${Config.comments}/${postId}/${commentId}`).get()).val();
+    return data as Comment;
+  }
 
 
-    /**
+  /**
      * Create a comment.
      * @param {string} postId post id of the comment
      * @param {Comment} data the comment data
      * @return { Promise<Reference> } Returns the reference of the comment.
      */
-    static async create(postId: string, data: Comment): Promise<Reference> {
-        if (!data.uid) {
-            throw new Error("uid is required");
-        }
-        if (!data.category) {
-            throw new Error("category is required");
-        }
-        data.createdAt = data.createdAt || ServerValue.TIMESTAMP;
-        const db = getDatabase();
-        const ref = db.ref(`${Config.comments}/${postId}`).push() as Reference;
-        await ref.set(data);
-        return ref;
+  static async create(postId: string, data: Comment): Promise<Reference> {
+    if (!data.uid) {
+      throw new Error("uid is required");
     }
+    if (!data.category) {
+      throw new Error("category is required");
+    }
+    data.createdAt = data.createdAt || ServerValue.TIMESTAMP;
+    const db = getDatabase();
+    const ref = db.ref(`${Config.comments}/${postId}`).push() as Reference;
+    await ref.set(data);
+    return ref;
+  }
 
 
-    /**
+  /**
      * Return an array of user uid of the ancestors of the comments.
      * 마지막 코멘트의 상위 코멘트들의 uid 를 리턴한다. 단, 글 uid 는 리턴 값에 포함되지 않는다.
      *
@@ -60,28 +60,28 @@ export class CommentService {
      * B 는 제외된다.
      *
      */
-    static async getAncestorsUid(
-        postId: string,
-        commentId: string,
-        authorUid?: string
-    ): Promise<string[]> {
-        const uids = [];
-        let comment = await this.get(postId, commentId);
-        if (comment == null) return [];
-        uids.push(comment.uid);
+  static async getAncestorsUid(
+    postId: string,
+    commentId: string,
+    authorUid?: string
+  ): Promise<string[]> {
+    const uids = [];
+    let comment = await this.get(postId, commentId);
+    if (comment == null) return [];
+    uids.push(comment.uid);
 
-        while (comment != null &&
+    while (comment != null &&
             comment.parentId &&
             comment.parentId !=
             comment.postId
-        ) {
-            comment = await this.get(postId, comment.parentId);
-            if (comment == null) break;
-            uids.push(comment.uid);
-        }
-        // return uids.filter((v, i, a) => a.indexOf(v) === i); // remove duplicate
-
-        // remove duplicates and remove authorUid
-        return [...new Set(uids)].filter((v) => v != authorUid) as string[];
+    ) {
+      comment = await this.get(postId, comment.parentId);
+      if (comment == null) break;
+      uids.push(comment.uid);
     }
+    // return uids.filter((v, i, a) => a.indexOf(v) === i); // remove duplicate
+
+    // remove duplicates and remove authorUid
+    return [...new Set(uids)].filter((v) => v != authorUid) as string[];
+  }
 }

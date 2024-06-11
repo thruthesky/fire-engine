@@ -13,7 +13,7 @@ import {DataSnapshot} from "firebase-functions/v2/database";
  * @return {boolean}
  */
 export function isCreate(change: Change<DataSnapshot>): boolean {
-    return !change.before.exists() && change.after.exists();
+  return !change.before.exists() && change.after.exists();
 }
 
 
@@ -24,7 +24,7 @@ export function isCreate(change: Change<DataSnapshot>): boolean {
  * @return {boolean}
  */
 export function isUpdate(change: Change<DataSnapshot>): boolean {
-    return change.before.exists() && change.after.exists();
+  return change.before.exists() && change.after.exists();
 }
 
 /**
@@ -34,7 +34,7 @@ export function isUpdate(change: Change<DataSnapshot>): boolean {
  * @return {boolean}
  */
 export function isDelete(change: Change<DataSnapshot>): boolean {
-    return change.before.exists() && !change.after.exists();
+  return change.before.exists() && !change.after.exists();
 }
 
 
@@ -51,11 +51,11 @@ export function isDelete(change: Change<DataSnapshot>): boolean {
  *
  */
 export function chunkArray<T>(myArray: T[], chunkSize: number): T[][] {
-    const results = [];
-    while (myArray.length) {
-        results.push(myArray.splice(0, chunkSize));
-    }
-    return results as T[][];
+  const results = [];
+  while (myArray.length) {
+    results.push(myArray.splice(0, chunkSize));
+  }
+  return results as T[][];
 }
 
 /**
@@ -65,10 +65,10 @@ export function chunkArray<T>(myArray: T[], chunkSize: number): T[][] {
  * it tries to retrieve it from the credential options. If it's not there either, it returns an empty string.
  */
 export function getProjectID(): string {
-    const app = admin.app();
-    // Return the project ID from the app options, or from the credential options if it's not set in the app options
-    // If it's not set in either, return an empty string
-    return app.options.projectId ||
+  const app = admin.app();
+  // Return the project ID from the app options, or from the credential options if it's not set in the app options
+  // If it's not set in either, return an empty string
+  return app.options.projectId ||
         (app.options.credential && (app.options.credential as unknown as { projectId: string }).projectId) || "";
 }
 
@@ -79,7 +79,7 @@ export function getProjectID(): string {
  * @param {unknown[]} args arguments to be logged to the console
  */
 export function dog(...args: unknown[]) {
-    console.log("-- dog;", ...args);
+  console.log("-- dog;", ...args);
 }
 
 
@@ -90,7 +90,7 @@ export function dog(...args: unknown[]) {
  * @return {string} string
  */
 export function strcut(str: string, length: number): string {
-    return str.length > length ? str.substring(0, length) : str;
+  return str.length > length ? str.substring(0, length) : str;
 }
 
 
@@ -102,8 +102,8 @@ export function strcut(str: string, length: number): string {
  * @return {any[]}
  */
 export const chunk = (arr: any[], size: number): any[] => // eslint-disable-line
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Array.from({length: Math.ceil(arr.length / size)}, (_: any, i: number) =>
-        arr.slice(i * size, i * size + size)
-    );
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Array.from({length: Math.ceil(arr.length / size)}, (_: any, i: number) =>
+    arr.slice(i * size, i * size + size)
+  );
 
