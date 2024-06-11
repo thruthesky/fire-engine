@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
-import { Change } from "firebase-functions/v1";
-import { DataSnapshot } from "firebase-functions/v2/database";
+import {Change} from "firebase-functions/v1";
+import {DataSnapshot} from "firebase-functions/v2/database";
 
 // import * as functions from "firebase-functions";
 // import { google } from "googleapis";
@@ -103,7 +103,7 @@ export function strcut(str: string, length: number): string {
  */
 export const chunk = (arr: any[], size: number): any[] => // eslint-disable-line
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Array.from({ length: Math.ceil(arr.length / size) }, (_: any, i: number) =>
+    Array.from({length: Math.ceil(arr.length / size)}, (_: any, i: number) =>
         arr.slice(i * size, i * size + size)
     );
 

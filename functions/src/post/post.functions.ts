@@ -7,17 +7,17 @@
 // import * as logger from "firebase-functions/logger";
 // import { getDatabase } from "firebase-admin/database";
 // import * as functions from "firebase-functions";
-import { Config } from "../config";
-import { isCreate, isDelete, isUpdate, strcut } from "../library";
-import { PostService } from "./post.service";
+import {Config} from "../config";
+import {isCreate, isDelete, isUpdate, strcut} from "../library";
+import {PostService} from "./post.service";
 
 
-import { DataSnapshot, DatabaseEvent, onValueCreated, onValueWritten } from "firebase-functions/v2/database";
+import {DataSnapshot, DatabaseEvent, onValueCreated, onValueWritten} from "firebase-functions/v2/database";
 
-import { PostCreateEvent } from "./post.interface";
-import { PostCreateMessage } from "../messaging/messaging.interfaces";
-import { MessagingService } from "../messaging/messaging.service";
-import { Change } from "firebase-functions/v1";
+import {PostCreateEvent} from "./post.interface";
+import {PostCreateMessage} from "../messaging/messaging.interfaces";
+import {MessagingService} from "../messaging/messaging.service";
+import {Change} from "firebase-functions/v1";
 
 
 /**
@@ -45,7 +45,6 @@ export const postSummaries = onValueWritten(
 //             await PostService.deleteSummary(context.params.category, context.params.postId);
 //         }
 //     });
-
 
 
 /**

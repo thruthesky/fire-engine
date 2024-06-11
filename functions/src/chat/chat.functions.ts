@@ -1,14 +1,14 @@
 
 import * as functions from "firebase-functions";
-import { ChatService } from "./chat.service";
-import { dog } from "../library";
-import { onCall } from "firebase-functions/v2/https";
+import {ChatService} from "./chat.service";
+import {dog} from "../library";
+import {onCall} from "firebase-functions/v2/https";
 
 
-import { MessagingService } from "../messaging/messaging.service";
+import {MessagingService} from "../messaging/messaging.service";
 
-import { ChatCreateEvent } from "./chat.interface";
-import { onValueCreated } from "firebase-functions/v2/database";
+import {ChatCreateEvent} from "./chat.interface";
+import {onValueCreated} from "firebase-functions/v2/database";
 
 
 /**
@@ -18,7 +18,7 @@ import { onValueCreated } from "firebase-functions/v2/database";
  * 즉, data 는 클라이언트가 전달하는 그대로의 값을 가지고 있다. 클라이언트가 boolean 전달하면,
  * data 는 그 자체로 boolean 값이 되고, number 를 전달하면, number 가 되고, object 를 전달하면
  * object 가 된다.
- * 
+ *
  * TODO - convert this into Gen2
  */
 export const chatJoinWithPassword = functions.https.onCall(async (data, context) => {
@@ -29,10 +29,9 @@ export const chatJoinWithPassword = functions.https.onCall(async (data, context)
 });
 
 
-
 /**
  * Check password of Gen2
- * 
+ *
  * This is not tested.
  */
 export const chatJoinWithPasswordGen2 = onCall(async (request) => {
