@@ -49,3 +49,18 @@ export interface PostSummaryAll {
     deleted?: boolean;
     category: string;
 }
+
+
+/**
+ * The event data on post create event trigger function
+ *
+ */
+export interface PostCreateEvent {
+    uid: string;
+    title?: string;
+    content?: string;
+    urls?: Array<string>;
+    createdAt: number;
+    order: number;
+    deleted?: boolean;
+}

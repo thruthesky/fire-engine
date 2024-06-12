@@ -1,11 +1,16 @@
-import * as admin from "firebase-admin";
-import axios, {AxiosError} from "axios";
-import {NotificationToUids, SendMultiMessages, SendOneMessage, UserLikeEvent} from "./messaging.interfaces";
+/* eslint-disable max-len */
+import {SendResponse, getMessaging} from "firebase-admin/messaging";
+import {MessageNotification, MessagePayload, MessageRequest, NotificationToUids, PostCreateMessage, UserLikeEvent} from "./messaging.interfaces";
+import {getDatabase} from "firebase-admin/database";
 import {Config} from "../config";
-import {chunkArray, dog, getProjectID} from "../library";
+import {chunk} from "../library";
+import {CommentCreateMessage} from "../comment/comment.interfaces";
+import {PostService} from "../post/post.service";
+import {CommentService} from "../comment/comment.service";
 import {UserService} from "../user/user.service";
-import {UserSettingService} from "../user-setting/user-setting.service";
+import {ChatCreateEvent} from "../chat/chat.interface";
 import {T} from "../texts";
+import {UserSettingService} from "../user-setting/user-setting.service";
 
 
 /* eslint-disable valid-jsdoc */
@@ -18,206 +23,386 @@ import {T} from "../texts";
  */
 export class MessagingService {
     /**
-     * Asynchronously fetches a short-lived Oauth2 access token from the Firebase Admin SDK.
+     * Android configuration for the message.
      *
-     * @return {Promise<string>} A promise that resolves to a short-lived Oauth2 access token.
-     * If the token cannot be retrieved, an empty string is returned.
+     * This is thee default configuration for the message.
      */
-    static async getAccessToken(): Promise<string> {
-        const accessToken = await admin.app().options.credential?.getAccessToken();
-        return accessToken?.access_token ?? "";
-    }
+    static android = {
+        notification: {
+            sound: "default",
+        },
+    };
 
     /**
-     * Send messages from tokens.
+     * APNS configuration for the message
      *
-     * @param {SendMultiMessages} message  Message to be sent
-     * - message.tokens 값은 콤마로 분리된 여러개의 토큰 또는 배열로된 토큰 일 수 있다.
-     * - message.maxConcurrent 값은 최대 병렬 전송 수를 나타낸다. 기본값은 100 이다.
-     *
-     * @return {Promise<Array<{ [key: string]: unknown }>>} Array of results
-     * - 결과는 배열로 리턴된다.
-     * - 단, 주의할 것은 입력값 확인을 해서 에러가 있으면, 토큰의 수와 상관없이 첫번째 배열 항목에만 에러 정보를 넣어서 리턴한다.
-     * - 토큰을 전송 할 때, access token 을 가져오지 못하면 마찬가지로 첫번째 배열 항목에 에러 정보를 넣어서 리턴한다.
-     *
+     * This is the default configuration for the message.
      */
-    static async sendMulti(message: SendMultiMessages): Promise<Array<{ [key: string]: unknown }>> {
-        // ---- 입력 값 체크 ---
-        //
-        if (!message.tokens) {
-            return [{code: "messaging/missing-tokens", message: "tokens is required"}];
-        }
-        // 토큰인 문자열로 들어오면, 배열로 변환한다.
-        if (typeof message.tokens === "string") {
-            message.tokens = (message.tokens as string).split(",");
-        }
-        if (message.tokens.length === 0) {
-            return [{code: "messaging/missing-tokens", message: "tokens is required"}];
-        }
-        if (!message.title) {
-            return [{code: "messaging/missing-title", message: "title is required"}];
-        }
-        if (!message.body) {
-            return [{code: "messaging/missing-body", message: "body is required"}];
-        }
-
-
-        // Firebase Admin SDK 에서 short-lived OAuth2 access token 을 가져온다. Bearer 토큰으로 사용한다.
-        const accessToken = await this.getAccessToken();
-        if (!accessToken) {
-            return [{code: "messaging/failed-to-get-access-token", message: "Failed to get access token"}];
-        }
-
-
-        // Chunk the array of tokens. The maximum number of tokens in a chunk is 200.
-        // 최대 200개 단위로 토큰을 나눈다.
-        const _size = message.maxConcurrent ?? Config.fcmMaxConcurrentConnections;
-        const chunkSize = _size > 200 ? 200 : _size;
-        const chunks: string[][] = chunkArray(message.tokens, chunkSize);
-
-        const results: Array<{ [key: string]: string }> = [];
-
-        // Promise.allSettled() 를 통해서 토큰을 chunkSize 만큼 나누어서 병렬로 전송한다.
-        for (const chunk of chunks) {
-            console.log("chunkSize:", chunkSize, ", no of tokens in chunk:", chunk.length, ", chunk:", chunk);
-            const promises = chunk.map((token) => this.sendOne({
-                token,
-                title: message.title,
-                body: message.body,
-                accessToken,
-                shortErrorMessage: message.shortErrorMessage,
-            }));
-            const re = await Promise.allSettled(promises);
-
-            results.push(...re.map((r) => {
-                return r.status === "fulfilled" ? r.value : r.reason;
-            }));
-        }
-        return results;
-    }
+    static apns = {
+        payload: {
+            aps: {
+                sound: "default",
+            },
+        },
+    };
 
 
     /**
-     * Send a single message
+     * Send messages
      *
-     * Note, it does not support the image, yet.
-     * To support the image, you need to create a new target in Xcode.
-     * And there are much work to consider. It's not working if you just add the image to the message.
-     * Due to the complexity, it is not supported yet.
+     * @param {MessageRequest} params - The parameters for sending messages.
+     * params.tokens - The list of tokens to send the message to.
+     * params.title - The title of the message.
+     * params.body - The body of the message.
+     * params.image - The image of the message.
+     * params.data - The extra data of the message.
      *
-     * @param {SendOneMessage} message Message to send
-     * @return {Promise} result of the message sending
+     *
+     * It returns the error results of push notification in a map like
+     * below. And it only returns the tokens that has error results.
+     * The tokens that succeed (without error) will not be returned.
+     *
+     * ```
+     * {
+     *   'fVWDxKs1kEzx...Lq2Vs': '',
+     *   'wrong-token': 'messaging/invalid-argument;addiontional error message',
+     * }
+     * ```
+     *
+     * If there is no error with the token, the value will be empty
+     * string. Otherwise, there will be a error message.
+     *
+     *
      */
-    private static async sendOne(message: SendOneMessage): Promise<{ [key: string]: unknown }> {
-        const accessToken = message.accessToken ?? await this.getAccessToken();
+    static async sendNotificationToTokens(params: MessageRequest): Promise<{ [token: string]: string; }> {
+        const promises = [];
 
-        try {
-            const projectID = getProjectID();
-            const re = await axios.post("https://fcm.googleapis.com/v1/projects/" + projectID + "/messages:send", {
-                "message": {
-                    token: message.token,
-                    notification: {
-                        title: message.title,
-                        body: message.body,
-                    },
-                    data: message.data,
-                },
-            }, {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + accessToken,
-                },
-            });
-            console.log("sendOne: success: re:", re.data);
-            return {code: "", token: message.token, message: ""};
-        } catch (e) {
-            if (e instanceof AxiosError) {
-                const error = e.response?.data.error;
-                const details = error?.details[0];
-                delete error.details;
+        if (typeof params.tokens != "object") {
+            throw new Error("tokens must be an array of string");
+        }
+        if (params.tokens.length == 0) {
+            throw new Error("tokens must not be empty");
+        }
+        if (!params.title) {
+            throw new Error("title must not be empty");
+        }
+        if (!params.body) {
+            throw new Error("body must not be empty");
+        }
 
-                if (message.shortErrorMessage) {
-                    return {
-                        code: "messaging/send-one-error",
-                        status: error.status,
-                        token: message.token,
-                    };
-                }
-                return {
-                    code: "messaging/send-one-error",
-                    message: "axios.post failed with",
-                    token: message.token,
-                    error,
-                    details,
-                };
+
+        // Remove empty tokens
+        const tokens = params.tokens.filter((token) => !!token);
+
+
+        // Image is optional
+        const notification: MessageNotification = {title: params.title, body: params.body};
+        if (params.image) {
+            notification["image"] = params.image;
+        }
+
+        // send the notification message to the list of tokens
+        for (const token of tokens) {
+            const message: MessagePayload = {
+                notification: notification,
+                data: params.data ?? {},
+                token: token,
+                android: MessagingService.android,
+                apns: MessagingService.apns,
+            };
+            console.log("message: ", message);
+            promises.push(getMessaging().send(message));
+        }
+
+        // Wait for all the promises to be resolved (even if some of them are rejected)
+        const res = await Promise.allSettled(promises);
+
+        // Return the error responses only. For the successful responses, it does not need to return them.
+        const responses: { [token: string]: string; } = {};
+        for (let i = 0; i < res.length; i++) {
+            const status: string = res[i].status;
+            console.log("status; ", status, res[i]);
+            if (status == "fulfilled") {
+                continue;
             } else {
-                console.error(e);
-                return {
-                    code: "messaging/send-one-error-unknown",
-                    token: message.token,
-                    message: "axios.post failed with",
-                };
+                const reason = (res[i] as PromiseRejectedResult).reason;
+                responses[tokens[i]] = reason["errorInfo"]["code"] + ":::" + reason["errorInfo"]["message"];
             }
         }
+        return responses;
     }
 
-
     /**
-     * Send a notification to a list of uids.
+     * 해당 게시판(카테고리)를 subscribe 한 사용자들에게 메시지를 보낸다.
      *
-     * @param {NotificationToUids} message  Message to be sent
-     * - message.uids: Array of uids to send the message to
-     * - message.chunkSize: Maximum number of uids in a chunk
-     * - message.title: Title of the message
-     * - message.body: Body of the message
-     * - message.data: Additional data to be sent
-     * - message.shortErrorMessage: If true, only the error message is returned
-     * - message.maxConcurrent: Maximum number of concurrent connections
+     * @param msg 글 정보
      *
-     * @return {Promise<Array<{ [key: string]: string }>>} Array of results
-     * - The result is returned as an array.
-     * - If there is an error, the error information is added to each array item and returned.
+     * @logic 새 글이 작성되면, 글을 subscribe 한 사용자들의 uid 를 가져와서, 그 사용자들에게 메시지를 전송한다.
+     *
+     * @return push-notification-logs 에 저장된 키.
+     *  - 푸시 알림을 보내고, 그 결과를 저장한다. 이 키를 사용하여 Unit Test 를 통해 결과를 확인할 수 있다.
+     *  - 데이터에는 postId 와 category 가 저장된다. commentId 가 없고, postId 필드만 있는 경우, 카테고리 subscription 에 대한 푸시 알림이다.
      */
-    static async sendNotificationToUids(message: NotificationToUids): Promise<Array<{ [key: string]: unknown }>> {
-        const uids = message.uids;
-        if (!uids) {
-            return [{code: "messaging/missing-uids", message: "uids is required"}];
-        }
-        if (uids.length === 0) {
-            return [{code: "messaging/missing-uids", message: "uids is required"}];
-        }
-        const tokens = await UserService.getTokens(uids);
-        if (tokens.length === 0) {
-            return [{code: "messaging/missing-tokens", message: "No tokens found"}];
-        }
+    static async sendMessagesToCategorySubscribers(msg: PostCreateMessage) {
+    // 해당 게시판(카테고리)를 subscribe 한 사용자들의 uid 를 가져온다.
+        const db = getDatabase();
+        const snapshot = await db.ref(`${Config.postSubscriptions}/${msg.category}`).get();
+        const uids: Array<string> = [];
+        snapshot.forEach((child) => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            uids.push(child.key!);
+        });
 
-        return this.sendMulti({
-            title: message.title,
-            body: message.body,
-            tokens,
-            data: message.data,
+        Config.log("-----> sendMessagesToCategorySubscribers uids:", uids);
+        return await this.sendNotificationToUids({
+            uids: uids, chunkSize: 256, title: msg.title, body: msg.body, image: msg.image, data: {
+                id: msg.id, category: msg.category,
+            },
+            action: "post",
+            targetId: msg.id,
         });
     }
 
-    /**
-     * Send a notification to a A when B likes A.
-     *
-     * This method is invoked by the user-B likes user-A, and send messages to all devices of A.
-     *
-     * @param {UserLikeEvent} event - The event triggered when a user likes another user.
-     *
-     * @return {Promise<Array<{ [key: string]: unknown }>>} Array of results. This is same result of 'sendMulti'.
-     */
-    static async sendMessageWhenUserLikeMe(event: UserLikeEvent): Promise<Array<{ [key: string]: unknown }>> {
-        console.log("sendMessageWhenUserLikeMe: event:", event);
-        // const user = await UserService.get(event.senderUid);
-        const displayName = await UserService.getDisplayName(event.senderUid);
 
-        // 메시지를 받는 사람의 언어 코드를 가져와 메세지 받는 사람의 언어로 메시지를 보낸다.
+    /**
+     * 사용자의 uid 들을 입력받아, 그 사용자들의 토큰으로 메시지 전송
+     *
+     * Send message to users
+     *
+     * 1. This gets the user tokens from '/user-fcm-tokens/{uid}'.
+     * 2. Then it chunks the tokens into 500 tokens per chunk.
+     * 3. Then delete the tokens that are not valid.
+     *
+     * @param {Array<string>} req.uids - The list of user uids to send the message to.
+     * @param {number} req.chunkSize - The size of chunk. Default 500. 한번에 보낼 메시지 수. 최대 500개.
+     * 그런데 500개씩 하니까 좀 느리다. 256씩 두번 보내는 것이 500개 한번 보내는 것보다 더 빠르다.
+     * 256 묶음으로 두 번 보내면 총 (두 번 포함) 22초.
+     * 500 묵음으로 한 번 보내면 총 90초.
+     * 128 묶음으로 4번 보내면 총 18 초
+     *
+     * 예제
+     * ```
+     * await MessagingService.sendNotificationToUids(['uid-a', 'uid-b'], 128, "title", "body");
+     * ```
+     *
+     * 더 많은 예제는 firebase/functions/tests/message/sendNotificationToUids.spec.ts 참고
+     *
+     * @param {string} req.title - The title of the message.
+     *
+     * @param {string} req.body - The body of the message.
+     *
+     * @param {string} req.image - The image of the message.
+     *
+     * @param {object} req.data - The extra data of the message.
+     *
+     * @param {string} req.action - The action of the message. This is used to log the message.
+     *
+     * @param {string} req.targetId - The target id of the message. This is used to log the message.
+     *
+     * @returns {string | undefined} - 로그를 기록하고 그 결과를 리턴한다.
+     */
+    static async sendNotificationToUids(req: NotificationToUids)
+        : Promise<string | void> {
+    // prepare the parameters
+        let {uids, chunkSize, title, body, image, data} = req;
+        data = data ?? {};
+        chunkSize = chunkSize ?? 500;
+
+
+        // 토큰 가져오기. 기본 500 개 단위로 chunk.
+        const tokenChunks = await this.getTokensOfUsers(uids, chunkSize);
+
+        Config.log("----> sendNotificationToUids() -> tokenChunks:", tokenChunks);
+
+        // 토큰 메시지 작성. 이미지는 옵션.
+        const notification: MessageNotification = {title, body};
+        if (image) {
+            notification["image"] = image;
+        }
+
+        const messaging = getMessaging();
+        let tokensWithError: Array<string> = [];
+
+        // chunk 단위로 메시지 작성해서 전송
+        for (const tokenChunk of tokenChunks) {
+            const messages: Array<MessagePayload> = [];
+            for (const token of tokenChunk) {
+                messages.push({
+                    notification,
+                    data,
+                    token,
+                    android: MessagingService.android,
+                    apns: MessagingService.apns,
+                });
+            }
+            Config.log("-----> sendNotificationToUids -> sendEach() messages[0]:", messages[0]);
+            const res = await messaging.sendEach(messages, Config.messagingDryRun);
+            Config.log("-----> sendNotificationToUids -> sendEach() result:", "successCount", res.successCount, "failureCount", res.failureCount,);
+
+
+            // chunk 단위로 전송 - 결과 확인 및 에러 토큰 삭제
+            for (let i = 0; i < messages.length; i++) {
+                const response = res.responses[i] as SendResponse;
+                if (response.success == false) {
+                    // 에러 토큰 표시
+                    messages[i].success = false;
+                    messages[i].code = response.error?.code;
+                    // console.log("error code:", response.error?.code);
+                    // console.log("error message:", response.error?.message);
+                }
+            }
+
+
+            // 전송 결과에서 에러가 있는 토큰을 골라낸다.
+            tokensWithError = messages.filter((message) => {
+                if (message.success !== false) return false;
+                // 푸시 토큰이 잘못되었을 때는 아래의 세개 중 한개의 에러 메시지가 나타난다.
+                if (message.code === "messaging/invalid-argument") return true;
+                else if (message.code === "messaging/invalid-registration-token") return true;
+                else if (message.code === "messaging/registration-token-not-registered") return true;
+
+                return false;
+            }).map((message) => message.token);
+            // Config.log("에러가 있는 토큰 목록(삭제될 토큰 목록):", tokensWithError);
+
+
+            // 에러가 있는 토큰 삭제 옵션이 설정되어져 있으면, 에러가 있는 토큰을 DB 에서 삭제한다.
+            if (Config.removeBadTokens) {
+                const promisesToRemove = [];
+                for (let i = 0; i < tokensWithError.length; i++) {
+                    promisesToRemove.push(getDatabase().ref(`${Config.userFcmTokens}/${tokensWithError[i]}`).remove());
+                }
+                await Promise.allSettled(promisesToRemove);
+            }
+        }
+
+        if (Config.logPushNotificationLogs) {
+            // 모든 토큰을 하나의 배열로 합친다.
+            const tokens = tokenChunks.flat();
+
+            console.log("tokensWithError:", tokensWithError);
+
+            // / 결과를 /push-notification-logs 에 저장한다.
+            const logData = {
+                action: req.action,
+                targetId: req.targetId,
+                title,
+                body,
+                createdAt: Date.now(),
+                // 전체 토큰 목록에서 에러가 없는 것만 기록
+                tokens: tokens.filter((token) => !tokensWithError.includes(token)),
+                // 에러가 있는 토큰 목록
+                tokensWithError: tokensWithError,
+            };
+            console.log(logData);
+            const ref = await getDatabase().ref(Config.pushNotificationLogs).push(logData);
+            return ref.key ?? void 0;
+        }
+    }
+
+
+    /**
+     * Returns the list of tokens under '/user-fcm-tokens/{uid}'.
+     *
+     * @param uids uids of users
+     * @param chunkSize chunk size - default 500. sendAll() 로 한번에 보낼 수 있는 최대 메세지 수는 500 개 이다.
+     * chunk 가 500 이고, 총 토큰의 수가 501 이면, 첫번째 배열에 500개의 토큰 두번째 배열에 1개의 토큰이 들어간다.
+     * 예를 들어, 토큰이 a, b, c, d, e 와 같이 5개인데, chunkSize 가 2 이면, 리턴 값은 [a, b], [c, d], [e] 가 된다.
+     *
+     * @returns Array<Array<string>> - Array of tokens. Each array contains 500 tokens.
+     * 리턴 값은 2차원 배열이다. 각 배열은 최대 [chunkSize] 개의 토큰을 담고 있다.
+     *
+     */
+    static async getTokensOfUsers(uids: Array<string>, chunkSize = 500): Promise<Array<Array<string>>> {
+        const promises = [];
+
+        if (uids.length == 0) return [];
+
+        const db = getDatabase();
+
+        // uid 사용자 별 모든 토큰을 가져온다.
+        for (const uid of uids) {
+            promises.push(db.ref(Config.userFcmTokens).orderByChild("uid").equalTo(uid).get());
+        }
+        const settled = await Promise.allSettled(promises);
+
+
+        // 토큰을 배열에 담는다.
+
+        const tokens: Array<string> = [];
+        for (const res of settled) {
+            if (res.status == "fulfilled") {
+                res.value.forEach((token) => {
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    tokens.push(token.key!);
+                });
+            }
+        }
+
+        // 토큰을 chunk 단위로 나누어 리턴
+        return chunk(tokens, chunkSize);
+    }
+
+
+    /**
+     * 내 글 또는 코멘트 아래에 새로운 코멘트가 달리는 경우 푸시 알림.
+     *
+     * @param commentCreateEvent 글 정보
+     *
+     * @return push-notification-logs 에 저장된 키.
+     *  - 푸시 알림을 보내고, 그 결과를 저장한다. 이 키를 사용하여 Unit Test 를 통해 결과를 확인할 수 있다.
+     *  - 데이터에는 commentId, postId, category 가 저장된다. commentId 필드에 값이 있으면 new comment 푸시 알림을 의미한다.
+     *
+     */
+    static async sendMessagesToNewCommentSubscribers(commentCreateEvent: CommentCreateMessage) {
+    // 글의 uid 를 가져온다.
+        const postAuthorUid = await PostService.getField(commentCreateEvent.category, commentCreateEvent.postId, "uid");
+
+        // 맨 하위 레벨 코멘트의 부모 uid 들을 가져온다.
+        const commentParentUids = await CommentService.getAncestorsUid(
+            commentCreateEvent.postId,
+            commentCreateEvent.id,
+        );
+
+        // 글의 uid 와 코멘트의 부모 uid 들을 합치는데, 중복되는 uid 는 제거한다.
+        let uids = Array.from(new Set([postAuthorUid, ...commentParentUids]));
+        if (uids.includes(commentCreateEvent.uid)) {
+            uids = uids.filter((uid) => uid != commentCreateEvent.uid);
+        }
+
+        console.log("all users (without comment creator)", uids);
+
+
+        // 코멘트 알림을 enable 한 사용자만 남기고 나머지는 제거한다.
+        uids = await UserService.filterUidsWithCommentNotification(uids);
+        console.log("uids with comment notification", uids);
+
+        // 코멘트 알림을 enable 한 사용자들에게만 푸시 알림을 전송한다.
+        return await this.sendNotificationToUids({
+            uids, chunkSize: 256, title: commentCreateEvent.title, body: commentCreateEvent.body, image: commentCreateEvent.image, data: {
+                id: commentCreateEvent.id, category: commentCreateEvent.category, postId: commentCreateEvent.postId,
+            },
+            action: "comment",
+            targetId: commentCreateEvent.id,
+        });
+    }
+
+
+    /**
+     * Sending notification when a user liked me
+     *
+     * @param event UserLikeEvent - The event when a user liked me
+     */
+    static async sendMessageWhenUserLikeMe(event: UserLikeEvent) {
+        const user = await UserService.get(event.receiverUid);
+        // const title = `${user.displayName} liked you.`;
+        // const body = `Please say Hi to ${user.displayName}.`;
+
         const langaugeCode = await UserSettingService.getLanguageCode(event.receiverUid);
-        console.log("sendMessageWhenUserLikeMe: displayName:", displayName, ", langaugeCode:", langaugeCode);
+        const displayName = await UserService.getDisplayName(event.senderUid);
         const title = T.likeFcmTitle(langaugeCode, displayName);
         const body = T.likeFcmBody(langaugeCode, displayName);
+
         const data = {
             uids: [event.receiverUid],
             title,
@@ -226,9 +411,75 @@ export class MessagingService {
                 receiverUid: event.receiverUid,
                 senderUid: event.senderUid,
             },
+            chunkSize: 256,
+            image: user.photoUrl,
+            action: "like",
+            targetId: event.receiverUid,
         };
-        dog("sendMessageWhenUserLikeMe: calling sendNotificationToUids(data):", data);
-        return await this.sendNotificationToUids(data);
+
+        await this.sendNotificationToUids(data);
+    }
+
+
+    /**
+     * 채팅 메시지가 전송되면, 해당 채팅방 사용자들에게 메시지를 전송한다.
+     *
+     * @param msg 채팅 메시지 정보
+     */
+    static async sendMessagesToChatRoomSubscribers(msg: ChatCreateEvent) {
+        const db = getDatabase();
+
+        Config.log("-----> sendMessagesToChatRoomSubscribers msg:", msg);
+
+        // Get the uids of the room users who have subscribed.
+        //
+        // 구독 한 사용자의 목록을 가져온다. 구독하지 않은 사용자 정보는 가져오지 않는다.
+        const snapshot = await db.ref(`chat-rooms/${msg.roomId}/users`).orderByValue().equalTo(true).get();
+
+        //
+        let uids: Array<string> = [];
+        snapshot.forEach((child) => {
+            // Don't send the message to myself.
+            if (child.key != msg.uid) {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                uids.push(child.key!);
+            }
+        });
+
+        //
+        Config.log("-----> sendMessagesToChatRoomSubscribers uids:", uids);
+
+        // Remove my uid from the list of uids to NOT receive the message from myself.
+        // @withcenter-dev2 : double check this logic
+        uids = uids.filter((uid) => uid != msg.uid);
+
+
+        // 그룹 채팅이면, 그룹 채팅방 이름과 사용자 이름을 표시한다.
+        let displayName = "";
+        if (msg.roomId.indexOf("---") == -1) {
+            const snap = await db.ref(`chat-rooms/${msg.roomId}/name`).get();
+
+            displayName += snap.val() ?? "그룹 챗";
+            displayName += " - ";
+        }
+
+        // 사용자 이름. 만약 사용자 이름이 없으면 "챗 메시지"로 표시한다.
+        const snap = await db.ref(`users/${msg.uid}/displayName`).get();
+        displayName += snap.val() ?? "챗 메시지";
+
+        const title = `${displayName}`;
+
+        // 사진을 업로드하면??
+        const body = msg.text ?? "사진을 업로드하였습니다.";
+
+        // 메시지를 전송한다.
+        await this.sendNotificationToUids({
+            uids, chunkSize: 256, title, body, image: msg.url, data: {
+                senderUid: msg.uid, messageId: msg.id, roomId: msg.roomId,
+            },
+            action: "chat",
+            targetId: msg.roomId,
+        });
     }
 }
 

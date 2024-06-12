@@ -1,7 +1,7 @@
-# Fireflutter Extension
+# Fireflutter Functions
 
 
-This extension simplifies the installation and management of Firebase Cloud Functions required by FireFlutter.
+- This extension simplifies the installation and management of Firebase Cloud Functions required by FireFlutter.
 
 
 ## Installation

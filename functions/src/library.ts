@@ -1,15 +1,18 @@
 import * as admin from "firebase-admin";
-import * as functions from "firebase-functions";
+import {Change} from "firebase-functions/v1";
+import {DataSnapshot} from "firebase-functions/v2/database";
+
+// import * as functions from "firebase-functions";
 // import { google } from "googleapis";
 
 
 /**
  * Returns true if the event is a create event
  *
- * @param {functions.Change<functions.database.DataSnapshot>} change
+ * @param {Change<DataSnapshot>} change
  * @return {boolean}
  */
-export function isCreate(change: functions.Change<functions.database.DataSnapshot>): boolean {
+export function isCreate(change: Change<DataSnapshot>): boolean {
     return !change.before.exists() && change.after.exists();
 }
 
@@ -17,20 +20,20 @@ export function isCreate(change: functions.Change<functions.database.DataSnapsho
 /**
  * Returns true if the event is an update event
  *
- * @param {functions.Change<functions.database.DataSnapshot>} change
+ * @param {Change<DataSnapshot>} change
  * @return {boolean}
  */
-export function isUpdate(change: functions.Change<functions.database.DataSnapshot>): boolean {
+export function isUpdate(change: Change<DataSnapshot>): boolean {
     return change.before.exists() && change.after.exists();
 }
 
 /**
  * Return true if the event is a delete event
  *
- * @param {functions.Change<functions.database.DataSnapshot>} change
+ * @param {Change<DataSnapshot>} change
  * @return {boolean}
  */
-export function isDelete(change: functions.Change<functions.database.DataSnapshot>): boolean {
+export function isDelete(change: Change<DataSnapshot>): boolean {
     return change.before.exists() && !change.after.exists();
 }
 
@@ -78,3 +81,29 @@ export function getProjectID(): string {
 export function dog(...args: unknown[]) {
     console.log("-- dog;", ...args);
 }
+
+
+/**
+ * Returns a string that is cut to the length.
+ * @param {string} str string to cut.
+ * @param {number} length length of the string after cutting
+ * @return {string} string
+ */
+export function strcut(str: string, length: number): string {
+    return str.length > length ? str.substring(0, length) : str;
+}
+
+
+/**
+ * Returns a string that is cut to the length.
+ *
+ * @param {any[]} arr array to cut
+ * @param {number} size size of the chunk
+ * @return {any[]}
+ */
+export const chunk = (arr: any[], size: number): any[] => // eslint-disable-line
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Array.from({length: Math.ceil(arr.length / size)}, (_: any, i: number) =>
+        arr.slice(i * size, i * size + size)
+    );
+

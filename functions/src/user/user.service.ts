@@ -102,7 +102,7 @@ export class UserService {
 
 
     /**
-     * Returns an array of user uids who have turned on the comment notification.
+     * Returns an array of user uids who have turned on the comment notification option.
      *
      * 입력된 사용자 uid 들 중에서 코멘트 알림을 켜 놓은 사용자 uid 를 리턴한다. 새 코멘트 푸시 알림을 보낼 때 사용된다.
      *

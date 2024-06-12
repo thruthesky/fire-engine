@@ -17,7 +17,7 @@ export class ChatService {
      * - false if the password is not set in the database
      */
     static async checkPassword(roomId: string, password: string): Promise<boolean> {
-        // if the password is empty, return false
+    // if the password is empty, return false
         if (!password) {
             return false;
         }

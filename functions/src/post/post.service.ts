@@ -22,6 +22,22 @@ export class PostService {
 
 
     /**
+     * 글 필드 내용을 가져와 리턴한다.
+     *
+     * @param {string} category 카테고리
+     * @param {string} postId 글 아이디
+     * @param {string} field 필드
+     * @return {Promise<any>} 필드의 내용을 리턴한다.
+     *
+     * @example 예제는 tests/forum/PostService.getField.spec.ts 를 참고한다.
+     */
+    static async getField(category: string, postId: string, field: string): Promise<any> { // eslint-disable-line
+        const db = getDatabase();
+        const data = (await db.ref(`${Config.posts}/${category}/${postId}/${field}`).get()).val();
+        return data;
+    }
+
+    /**
      * Sets the summary of the post in `post-summaries` and `post-all-summary`
      *
      * @param {PostCreateBackgroundEvent} post post data from the event

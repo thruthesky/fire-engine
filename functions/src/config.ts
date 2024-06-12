@@ -72,7 +72,7 @@ export class Config {
      * @param {any} optionalParams optional parameters to log
      */
     static log(message: string,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...optionalParams: any[]) {
         if (Config.debug) {
             console.log(message, ...optionalParams);
@@ -89,18 +89,15 @@ export class Config {
     // 그래서, 가능한 이 값을 false 로 하여, 푸시 알림을 할 때 잘못된 토큰을 삭제하지 않을 것을 권장한다. 잘못된 토큰을 DB 에 계속 남겨 두고, 반복적으로 푸시 알림 에러가 떠도 큰 문제가 없다.
     // 이 값이 true 로 지정되면, 잘못된 토큰을 삭제한다.
     //
-    // @depcreated
-    // static removeBadTokens = false;
+    static removeBadTokens = false;
 
 
     // 푸시 알림을 보낼 때, dry run 을 할 것인지 여부.
     // dry run 을 true 로 하면, 실제로 메시지가 전달되지 않는다. 즉, 테스트 할 때에만 true 로 한다.
-    // static messagingDryRun = false;
+    static messagingDryRun = false;
 
 
     // 푸시 알림을 보낼 때, 한번의 batch 작업에서 보낼 수 있는 최대 토큰 수.
     // 예를 들어 총 토큰의 수가 101 개 이고, 이 값이 100 이면, 100 개의 토큰을 한번에 보내고, 나머지 1개의 토큰을 다시 보낸다. 즉, 두번 batch 작업을 한다.
     static fcmMaxConcurrentConnections = 100;
 }
-
-
