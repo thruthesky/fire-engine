@@ -156,8 +156,9 @@ export class UserService {
         for (const res of settled) {
             if (res.status == "fulfilled") {
                 res.value.forEach((token) => {
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    tokens.push(token.key!);
+                    if (token.key != null) {
+                        tokens.push(token.key);
+                    }
                 });
             }
         }
