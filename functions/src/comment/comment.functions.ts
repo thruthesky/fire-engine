@@ -4,6 +4,8 @@ import { } from "../messaging/messaging.interfaces";
 import {MessagingService} from "../messaging/messaging.service";
 import {CommentCreateEvent, CommentCreateMessage} from "./comment.interfaces";
 import {strcut} from "../library";
+import { Config } from "../config";
+import { logger } from "firebase-functions/v2";
 
 
 /**
@@ -12,7 +14,10 @@ import {strcut} from "../library";
  * @return {Promise<string>} 푸시 알림 전송 후, 그 기록으로 생성된 키를 리턴한다. 이 키는 테스트 할 때 사용 할 수 있다.
  */
 export const sendMessagesToCommentSubscribers = onValueCreated(
-    "/comments/{postId}/{commentId}",
+    {    
+        ref: "/comments/{postId}/{commentId}",
+        region: Config.region,
+    },
     async (event) => {
     // Grab the current value of what was written to the Realtime Database.
         const data = event.data.val() as CommentCreateEvent;
@@ -29,6 +34,8 @@ export const sendMessagesToCommentSubscribers = onValueCreated(
         };
 
         console.log("sendMessagesToCommentSubscribers: ", comment);
+        logger.info("sendMessagesToCommentSubscribers: ", comment);
+
         return await MessagingService.sendMessagesToNewCommentSubscribers(comment);
     });
 

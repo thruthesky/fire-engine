@@ -1,5 +1,5 @@
 
-// eslint-disable-next-line max-len
+ 
 import {AndroidConfig, ApnsConfig, FcmOptions, WebpushConfig} from "firebase-admin/messaging";
 
 /**
