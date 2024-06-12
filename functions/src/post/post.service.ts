@@ -1,7 +1,7 @@
-import { getDatabase } from "firebase-admin/database";
-import { Post, PostCreateBackgroundEvent, PostSummary, PostSummaryAll } from "./post.interface";
-import { Config } from "../config";
-import { strcut } from "../library";
+import {getDatabase} from "firebase-admin/database";
+import {Post, PostCreateBackgroundEvent, PostSummary, PostSummaryAll} from "./post.interface";
+import {Config} from "../config";
+import {strcut} from "../library";
 
 /**
  * Post service class
@@ -50,17 +50,27 @@ export class PostService {
         if (post.uid === undefined) throw new Error("uid is required");
         if (post.createdAt === undefined) throw new Error("createdAt is required");
         if (post.order === undefined) throw new Error("order is required");
-        const order = -post.createdAt;
+
+        const url = post.urls?.[0] ?? null;
         const summary = {
             uid: post.uid,
             createdAt: post.createdAt,
-            order: order,
-            group_order: order,
+            order: -post.createdAt,
             title: post.title ? strcut(post.title, 64) : null,
             content: post.content ? strcut(post.content, 128) : null,
-            url: post.urls?.[0] ?? null,
+            url: url,
             deleted: post.deleted ?? null,
         } as PostSummary;
+
+        if (url) {
+            summary.photoOrder = -post.createdAt;
+        }
+
+        if (post.group) {
+            summary.group = post.group;
+            // To sort the posts by group. It's a string, so, the number itself must be small.
+            summary.group_order = post.group + (9999999999999 - post.createdAt);
+        }
 
         const db = getDatabase();
         await db.ref(`${Config.postSummaries}/${category}/${id}`).update(summary);

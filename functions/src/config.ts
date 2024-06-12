@@ -10,12 +10,12 @@ export class Config {
     static debug = true;
 
     // Cloud Functions Server Region
-    static region = "asia-northeast3";
+    static region = "nam5"; // asia-northeast3
 
     // Firebase Realtime Database Region
     //
     // The functions that listens the Realtime Database events must be in the same region as the Realtime Database.
-    static rtdbRegion = "asia-southeast1";
+    static rtdbRegion = "us-central1"; // asia-southeast1
 
     static typesenseCollection = "silversSearch";
     // testing

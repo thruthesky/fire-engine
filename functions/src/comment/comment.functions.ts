@@ -5,6 +5,7 @@ import {MessagingService} from "../messaging/messaging.service";
 import {CommentCreateEvent, CommentCreateMessage} from "./comment.interfaces";
 import {strcut} from "../library";
 import {Config} from "../config";
+import {ServerValue, getDatabase} from "firebase-admin/database";
 
 
 /**
@@ -37,3 +38,20 @@ async (event) => {
 });
 
 
+/**
+ * Update noOfComments field of the post under `/posts-summaries` and `/posts-all-summaries`. Excluding `/posts`.
+ */
+export const onCommentCreate = onValueCreated({
+    ref: "/comments/{postId}/{commentId}",
+    region: Config.rtdbRegion,
+}, async (event) => {
+    const data = event.data.val() as CommentCreateEvent;
+    const postId = event.params.postId;
+    const category = data.category;
+
+    console.log("onCommentCreate: ", data, event.params);
+
+    const db = getDatabase();
+    await db.ref(`${Config.postAllSummaries}/${postId}/noOfComments`).set(ServerValue.increment(1));
+    await db.ref(`${Config.postSummaries}/${category}/${postId}/noOfComments`).set(ServerValue.increment(1));
+});

@@ -25,6 +25,8 @@ export interface PostCreateBackgroundEvent {
     createdAt: number;
     order: number;
     deleted?: boolean;
+    group?: string;
+    group_order?: string;
 }
 
 
@@ -33,9 +35,12 @@ export interface PostSummary {
     title?: string;
     content?: string;
     url?: string;
+    photoOrder?: number;
     createdAt: number;
     order: number;
     deleted?: boolean;
+    group?: string;
+    group_order?: string;
 }
 
 
