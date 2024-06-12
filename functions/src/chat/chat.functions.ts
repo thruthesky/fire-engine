@@ -1,15 +1,15 @@
 
 
-import { ChatService } from "./chat.service";
-import { dog } from "../library";
-import { onCall } from "firebase-functions/v2/https";
+import {ChatService} from "./chat.service";
+import {dog} from "../library";
+import {onCall} from "firebase-functions/v2/https";
 
 
-import { MessagingService } from "../messaging/messaging.service";
+import {MessagingService} from "../messaging/messaging.service";
 
-import { ChatCreateEvent } from "./chat.interface";
-import { onValueCreated } from "firebase-functions/v2/database";
-import { Config } from "../config";
+import {ChatCreateEvent} from "./chat.interface";
+import {onValueCreated} from "firebase-functions/v2/database";
+import {Config} from "../config";
 
 
 /**

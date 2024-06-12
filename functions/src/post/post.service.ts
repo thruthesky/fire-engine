@@ -1,6 +1,7 @@
-import {getDatabase} from "firebase-admin/database";
-import {Post, PostCreateBackgroundEvent, PostSummary, PostSummaryAll} from "./post.interface";
-import {Config} from "../config";
+import { getDatabase } from "firebase-admin/database";
+import { Post, PostCreateBackgroundEvent, PostSummary, PostSummaryAll } from "./post.interface";
+import { Config } from "../config";
+import { strcut } from "../library";
 
 /**
  * Post service class
@@ -49,18 +50,22 @@ export class PostService {
         if (post.uid === undefined) throw new Error("uid is required");
         if (post.createdAt === undefined) throw new Error("createdAt is required");
         if (post.order === undefined) throw new Error("order is required");
+        const order = -post.createdAt;
         const summary = {
             uid: post.uid,
             createdAt: post.createdAt,
-            order: -post.createdAt,
-            title: post.title ?? null,
-            content: post.content ?? null,
+            order: order,
+            group_order: order,
+            title: post.title ? strcut(post.title, 64) : null,
+            content: post.content ? strcut(post.content, 128) : null,
             url: post.urls?.[0] ?? null,
             deleted: post.deleted ?? null,
         } as PostSummary;
 
         const db = getDatabase();
         await db.ref(`${Config.postSummaries}/${category}/${id}`).update(summary);
+
+        // Add category
         const summaryAll: PostSummaryAll = {
             ...summary,
             category,
