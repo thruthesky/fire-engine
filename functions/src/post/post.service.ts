@@ -64,6 +64,8 @@ export class PostService {
 
         if (url) {
             summary.photoOrder = -post.createdAt;
+        }   else {
+           summary.photoOrder = null ;
         }
 
         if (post.group) {

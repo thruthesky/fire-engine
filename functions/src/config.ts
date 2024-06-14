@@ -15,7 +15,7 @@ export class Config {
     // Firebase Realtime Database Region
     //
     // The functions that listens the Realtime Database events must be in the same region as the Realtime Database.
-    static rtdbRegion = "us-central1"; // asia-southeast1
+    static rtdbRegion = "asia-southeast1"; // asia-southeast1 us-central1
 
     static typesenseCollection = "silversSearch";
     // testing
