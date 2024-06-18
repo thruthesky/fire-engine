@@ -20,39 +20,42 @@ import {DataSnapshot, DatabaseEvent, onValueWritten} from "firebase-functions/v2
  *
  */
 export const userLike =
-    onValueWritten(`${Config.whoILike}/{myUid}/{targetUid}`,
-        async (event: DatabaseEvent<functions.Change<DataSnapshot>>) => {
-            const change = event.data;
-            const params = event.params;
-            dog("-- userLike begins; change.before:", change.before.val(), "change.after:", change.after.val());
-            const db = getDatabase();
-            const myUid = params.myUid;
-            const targetUid = params.targetUid;
+    onValueWritten({
+        ref: `${Config.whoILike}/{myUid}/{targetUid}`,
+        region: Config.rtdbRegion,
+    },
+    async (event: DatabaseEvent<functions.Change<DataSnapshot>>) => {
+        const change = event.data;
+        const params = event.params;
+        dog("-- userLike begins; change.before:", change.before.val(), "change.after:", change.after.val());
+        const db = getDatabase();
+        const myUid = params.myUid;
+        const targetUid = params.targetUid;
 
-            dog("-- userLike path; myUid:", myUid, "targetUid:", targetUid);
-
-
-            // created or updated
-            if (isCreate(change) || isUpdate(change)) {
-                dog("-- userLike; create or update;");
-                await db.ref(`${Config.whoLikeMe}/${targetUid}`).update({[myUid]: true});
-                await db.ref(`users/${targetUid}`).update({noOfLikes: ServerValue.increment(1)});
-            } else if (isDelete(change)) {
-                dog("-- userLike; delete;");
-                // deleted
-                await db.ref(`${Config.whoLikeMe}/${targetUid}/${myUid}`).remove();
-                await db.ref(`users/${targetUid}`).update({noOfLikes: ServerValue.increment(-1)});
-            }
+        dog("-- userLike path; myUid:", myUid, "targetUid:", targetUid);
 
 
-            // Send message to the target user
-            if (isCreate(change)) {
-                dog("-- userLike; send message;");
-                const resultsOfUserLikeMessage = await MessagingService.sendMessageWhenUserLikeMe({
-                    receiverUid: targetUid,
-                    senderUid: myUid,
-                });
-                dog("-- userLike; resultsOfUserLikeMessage:", resultsOfUserLikeMessage);
-            }
-        });
+        // created or updated
+        if (isCreate(change) || isUpdate(change)) {
+            dog("-- userLike; create or update;");
+            await db.ref(`${Config.whoLikeMe}/${targetUid}`).update({[myUid]: true});
+            await db.ref(`users/${targetUid}`).update({noOfLikes: ServerValue.increment(1)});
+        } else if (isDelete(change)) {
+            dog("-- userLike; delete;");
+            // deleted
+            await db.ref(`${Config.whoLikeMe}/${targetUid}/${myUid}`).remove();
+            await db.ref(`users/${targetUid}`).update({noOfLikes: ServerValue.increment(-1)});
+        }
+
+
+        // Send message to the target user
+        if (isCreate(change)) {
+            dog("-- userLike; send message;");
+            const resultsOfUserLikeMessage = await MessagingService.sendMessageWhenUserLikeMe({
+                receiverUid: targetUid,
+                senderUid: myUid,
+            });
+            dog("-- userLike; resultsOfUserLikeMessage:", resultsOfUserLikeMessage);
+        }
+    });
 

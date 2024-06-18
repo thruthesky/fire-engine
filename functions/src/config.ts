@@ -9,8 +9,13 @@ export class Config {
     // debug = true 이면, 함수에 로그를 남긴다.
     static debug = true;
 
-    // Cloud Functions Server Resion
-    static region = "asia-southeast1";
+    // Cloud Functions Server Region
+    static region = "nam5"; // asia-northeast3
+
+    // Firebase Realtime Database Region
+    //
+    // The functions that listens the Realtime Database events must be in the same region as the Realtime Database.
+    static rtdbRegion = "us-central1"; // asia-southeast1
 
     static typesenseCollection = "silversSearch";
     // testing
@@ -72,7 +77,7 @@ export class Config {
      * @param {any} optionalParams optional parameters to log
      */
     static log(message: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...optionalParams: any[]) {
         if (Config.debug) {
             console.log(message, ...optionalParams);

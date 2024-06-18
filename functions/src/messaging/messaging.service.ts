@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+ 
 import {SendResponse, getMessaging} from "firebase-admin/messaging";
 import {MessageNotification, MessagePayload, MessageRequest, NotificationToUids, PostCreateMessage, UserLikeEvent} from "./messaging.interfaces";
 import {getDatabase} from "firebase-admin/database";
@@ -11,9 +11,10 @@ import {UserService} from "../user/user.service";
 import {ChatCreateEvent} from "../chat/chat.interface";
 import {T} from "../texts";
 import {UserSettingService} from "../user-setting/user-setting.service";
+import { logger } from "firebase-functions/v2";
 
 
-/* eslint-disable valid-jsdoc */
+/* eslint-disable */
 
 /**
  * MessagingService
@@ -149,7 +150,6 @@ export class MessagingService {
         const snapshot = await db.ref(`${Config.postSubscriptions}/${msg.category}`).get();
         const uids: Array<string> = [];
         snapshot.forEach((child) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             uids.push(child.key!);
         });
 
@@ -333,7 +333,7 @@ export class MessagingService {
         for (const res of settled) {
             if (res.status == "fulfilled") {
                 res.value.forEach((token) => {
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                     
                     tokens.push(token.key!);
                 });
             }
@@ -364,6 +364,8 @@ export class MessagingService {
             commentCreateEvent.id,
         );
 
+        logger.info("commentParentUids" , commentParentUids);
+
         // 글의 uid 와 코멘트의 부모 uid 들을 합치는데, 중복되는 uid 는 제거한다.
         let uids = Array.from(new Set([postAuthorUid, ...commentParentUids]));
         if (uids.includes(commentCreateEvent.uid)) {
@@ -371,11 +373,16 @@ export class MessagingService {
         }
 
         console.log("all users (without comment creator)", uids);
+        logger.info("all users (without comment creator)", uids);
+
 
 
         // 코멘트 알림을 enable 한 사용자만 남기고 나머지는 제거한다.
         uids = await UserService.filterUidsWithCommentNotification(uids);
         console.log("uids with comment notification", uids);
+
+        logger.info("uids with comment notification", uids);
+
 
         // 코멘트 알림을 enable 한 사용자들에게만 푸시 알림을 전송한다.
         return await this.sendNotificationToUids({
@@ -441,7 +448,7 @@ export class MessagingService {
         snapshot.forEach((child) => {
             // Don't send the message to myself.
             if (child.key != msg.uid) {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                 
                 uids.push(child.key!);
             }
         });

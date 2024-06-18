@@ -1,4 +1,10 @@
-# Fireflutter Functions
+# FireEngine
+
+
+- FireEngine 은 FireFlutter 및 기타 파이어베이스를 사용하는 프론트엔드의 백엔드를 지원하기 위한 클라우드 함수들의 모음이다.
+- 회원 관리, 게시판, 채팅 및 다양한 기능을 지원한다.
+- 참고로, FireEngine 에 속해 있던 mirroring 함수들은 [mirror-database-to-firestore](https://github.com/thruthesky/mirror-database-to-firestore) 로 분리되었다. Realtime Database 의 정보를 Firestore 로 이동하고자 한다면, 이 [mirror-database-to-firestore](https://github.com/thruthesky/mirror-database-to-firestore) 를 사용하도록 한다. 설치하는 방법은 각 프론트엔드 플랫폼에서 설명이 되어 있을 것이다.
+- 
 
 
 - This extension simplifies the installation and management of Firebase Cloud Functions required by FireFlutter.
