@@ -86,7 +86,6 @@ const defaultHtml = `<!DOCTYPE html>
       console.log('---> Detected os', os, userAgent);
 
       if (os === "iOS") {
-        alert(appStoreUrl);
         if ( appStoreUrl ) {
           window.location.replace(appStoreUrl);
         } else {
