@@ -10,17 +10,20 @@ export class Config {
     // debug = true 이면, 함수에 로그를 남긴다.
     static debug = true;
 
+    // asia-northeast3 => Seoul
+    // us-central1 => default region (US)
+    // asia-southeast1 => Singapore
 
     // Sets default options for all functions written using the 2nd gen SDK
     //
     // This is used in index.ts to set the region of the 2nd gen functions.
     // If you don't know what to put, then put the same region of the Firestore or Realtime Database.
-    static region = "asia-southeast1";
+    static region = "asia-southeast1"; //  "us-central1";  "asia-southeast1";
 
     // Cloud Functions Server Region
     //
     // This is not used for the meantime.
-    static firestoreRegion = "asia-northeast3"; // asia-northeast3
+    static firestoreRegion = "asia-northeast3"; // "nam5"; // "asia-northeast3";
 
     // Firebase Realtime Database Region
     //
