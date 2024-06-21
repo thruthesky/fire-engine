@@ -16,7 +16,7 @@ export const mirrorDatabaseToFirestore =
         return onValueWritten(
             {
                 ref: path.source,
-                region: Config.region,
+                region: Config.databaseRegion,
             },
             async (event: DatabaseEvent<functions.Change<DataSnapshot>>) => {
                 const change = event.data;

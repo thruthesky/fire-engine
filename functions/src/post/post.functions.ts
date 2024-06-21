@@ -7,17 +7,17 @@
 // import * as logger from "firebase-functions/logger";
 // import { getDatabase } from "firebase-admin/database";
 // import * as functions from "firebase-functions";
-import {Config} from "../config";
-import {isCreate, isDelete, isUpdate, strcut} from "../library";
-import {PostService} from "./post.service";
+import { Config } from "../config";
+import { isCreate, isDelete, isUpdate, strcut } from "../library";
+import { PostService } from "./post.service";
 
 
-import {DataSnapshot, DatabaseEvent, onValueCreated, onValueWritten} from "firebase-functions/v2/database";
+import { DataSnapshot, DatabaseEvent, onValueCreated, onValueWritten } from "firebase-functions/v2/database";
 
-import {PostCreateEvent} from "./post.interface";
-import {PostCreateMessage} from "../messaging/messaging.interfaces";
-import {MessagingService} from "../messaging/messaging.service";
-import {Change} from "firebase-functions/v1";
+import { PostCreateEvent } from "./post.interface";
+import { PostCreateMessage } from "../messaging/messaging.interfaces";
+import { MessagingService } from "../messaging/messaging.service";
+import { Change } from "firebase-functions/v1";
 
 
 /**
@@ -26,15 +26,15 @@ import {Change} from "firebase-functions/v1";
 export const postSummaries = onValueWritten({
     ref:
         `${Config.posts}/{category}/{postId}`,
-    region: Config.rtdbRegion,
+    region: Config.databaseRegion,
 },
-async (event: DatabaseEvent<Change<DataSnapshot>>) => {
-    if (isCreate(event.data) || isUpdate(event.data)) {
-        await PostService.setSummary(event.data.after.val(), event.params.category, event.params.postId);
-    } else if (isDelete(event.data)) {
-        await PostService.deleteSummary(event.params.category, event.params.postId);
-    }
-},
+    async (event: DatabaseEvent<Change<DataSnapshot>>) => {
+        if (isCreate(event.data) || isUpdate(event.data)) {
+            await PostService.setSummary(event.data.after.val(), event.params.category, event.params.postId);
+        } else if (isDelete(event.data)) {
+            await PostService.deleteSummary(event.params.category, event.params.postId);
+        }
+    },
 );
 
 // export const postSummaries = functions.database.ref(`${Config.posts}/{category}/{postId}`)
@@ -58,22 +58,22 @@ async (event: DatabaseEvent<Change<DataSnapshot>>) => {
 export const sendMessagesToCategorySubscribers = onValueCreated({
     ref:
         `${Config.posts}/{category}/{id}`,
-    region: Config.rtdbRegion,
+    region: Config.databaseRegion,
 },
-async (event) => {
-    // Grab the current value of what was written to the Realtime Database.
-    const data = event.data.val() as PostCreateEvent;
+    async (event) => {
+        // Grab the current value of what was written to the Realtime Database.
+        const data = event.data.val() as PostCreateEvent;
 
-    const post: PostCreateMessage = {
-        id: event.params.id,
-        category: event.params.category,
-        title: strcut(data.title ?? "", 64),
-        body: strcut(data.content ?? "", 100),
-        uid: data.uid,
-        image: data.urls?.[0] ?? "",
-    };
+        const post: PostCreateMessage = {
+            id: event.params.id,
+            category: event.params.category,
+            title: strcut(data.title ?? "", 64),
+            body: strcut(data.content ?? "", 100),
+            uid: data.uid,
+            image: data.urls?.[0] ?? "",
+        };
 
-    return await MessagingService.sendMessagesToCategorySubscribers(post);
-});
+        return await MessagingService.sendMessagesToCategorySubscribers(post);
+    });
 
 

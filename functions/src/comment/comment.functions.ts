@@ -16,7 +16,7 @@ import { ServerValue, getDatabase } from "firebase-admin/database";
 export const sendMessagesToCommentSubscribers = onValueCreated({
     ref:
         "/comments/{postId}/{commentId}",
-    region: Config.rtdbRegion,
+    region: Config.databaseRegion,
 },
     async (event) => {
         // Grab the current value of what was written to the Realtime Database.
@@ -43,7 +43,7 @@ export const sendMessagesToCommentSubscribers = onValueCreated({
  */
 export const onCommentCreate = onValueCreated({
     ref: "/comments/{postId}/{commentId}",
-    region: Config.rtdbRegion,
+    region: Config.databaseRegion,
 }, async (event) => {
     const data = event.data.val() as CommentCreateEvent;
     const postId = event.params.postId;
