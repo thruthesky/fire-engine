@@ -14,21 +14,22 @@ export class Config {
     // Sets default options for all functions written using the 2nd gen SDK
     //
     // This is used in index.ts to set the region of the 2nd gen functions.
-    static region = "asia-northeast3";
+    // If you don't know what to put, then put the same region of the Firestore or Realtime Database.
+    static region = "asia-southeast1";
 
     // Cloud Functions Server Region
     //
     // This is not used for the meantime.
-    static firestoreRegion = "nam5"; // asia-northeast3
+    static firestoreRegion = "asia-northeast3"; // asia-northeast3
 
     // Firebase Realtime Database Region
     //
     // The functions that listens the Realtime Database events must be in the same region as the Realtime Database.
-    static databaseRegion = "us-central1"; // asia-southeast1
+    static databaseRegion = "asia-southeast1"; // "us-central1"; // asia-southeast1
 
     // @deprecated delete this immediately.
-
     static typesenseCollection = "silversSearch";
+
 
     // User paths
     static users = "users";
