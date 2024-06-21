@@ -86,7 +86,6 @@ const defaultHtml = `<!DOCTYPE html>
       console.log('---> Detected os', os, userAgent);
 
       if (os === "iOS") {
-        alert(appStoreUrl);
         if ( appStoreUrl ) {
           window.location.replace(appStoreUrl);
         } else {
@@ -167,10 +166,6 @@ async function getPreview(uid: string, pid: string, cid: string): Promise<{ [key
  * @return {Promise}
  */
 async function getPostPreview(pid: string): Promise<{ [key: string]: string }> {
-    // TODO for confirmation:
-    // In RTDB, the cost is based on the data transfered not per read.
-    // In this code, the snapshot is getitng all the details under the post.
-    // Will it be better if we get value one by one?
     const docSnap = await getRtdbSnapshot(`post-all-summaries/${pid}`);
     if (docSnap.exists()) {
         const post = docSnap.val();
