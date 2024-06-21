@@ -1,3 +1,4 @@
+import { MirrorPath } from "./config.interfaces";
 
 
 /**
@@ -17,9 +18,9 @@ export class Config {
     // The functions that listens the Realtime Database events must be in the same region as the Realtime Database.
     static rtdbRegion = "us-central1"; // asia-southeast1
 
+    // @deprecated delete this immediately.
+
     static typesenseCollection = "silversSearch";
-    // testing
-    // static typesenseCollection = "testSearch";
 
     // User paths
     static users = "users";
@@ -105,4 +106,30 @@ export class Config {
     // 푸시 알림을 보낼 때, 한번의 batch 작업에서 보낼 수 있는 최대 토큰 수.
     // 예를 들어 총 토큰의 수가 101 개 이고, 이 값이 100 이면, 100 개의 토큰을 한번에 보내고, 나머지 1개의 토큰을 다시 보낸다. 즉, 두번 batch 작업을 한다.
     static fcmMaxConcurrentConnections = 100;
+
+
+    // Mirror paths
+    /**
+   * Paths to mirror.
+   */
+    public static mirrorPaths: Array<MirrorPath> = [
+        {
+            source: "admins/{uid}",
+            destination: "admins",
+        },
+        {
+            source: "users/{uid}",
+            destination: "users",
+        },
+        {
+            source: "posts/{category}/{postId}",
+            destination: "posts",
+            // fields: ["name", "timestamp"],
+        },
+        {
+            source: "comments/{postId}/{commentId}",
+            destination: "comments",
+        },
+    ];
 }
+

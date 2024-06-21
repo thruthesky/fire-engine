@@ -1,6 +1,7 @@
 import * as admin from "firebase-admin";
-import {Change} from "firebase-functions/v1";
-import {DataSnapshot} from "firebase-functions/v2/database";
+import { Change } from "firebase-functions/v1";
+import { DataSnapshot } from "firebase-functions/v2/database";
+import { MirrorPath } from "./config.interfaces";
 
 // import * as functions from "firebase-functions";
 // import { google } from "googleapis";
@@ -102,8 +103,40 @@ export function strcut(str: string, length: number): string {
  * @return {any[]}
  */
 export const chunk = (arr: any[], size: number): any[] => // eslint-disable-line
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Array.from({length: Math.ceil(arr.length / size)}, (_: any, i: number) =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Array.from({ length: Math.ceil(arr.length / size) }, (_: any, i: number) =>
         arr.slice(i * size, i * size + size)
     );
 
+
+
+
+/**
+ * Returns a map data that can be saved into Firestore
+ *
+ * @param { ConfigPath } path The path to be converted
+ * @param { object } data The data to be converted
+ * @return { object }
+ *
+ * see `convertData.spec.ts` for the test
+ */
+export function convertData(path: MirrorPath, data: { [key: string]: unknown }): { [key: string]: unknown } {
+    if (data === null) {
+        return {};
+    } else if (Array.isArray(data)) {
+        return { "_data": data };
+    } else if (typeof data === "object") {
+        // If the fields are specified, only include those fields
+        if (path.fields) {
+            const result = {} as { [key: string]: unknown };
+            path.fields.forEach((field) => {
+                if (data[field]) result[field] = data[field];
+            });
+            return result;
+        } else {
+            return data;
+        }
+    } else {
+        return { "_data": data };
+    }
+}
