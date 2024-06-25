@@ -65,6 +65,7 @@ export class PostService {
         if (url) {
             summary.photoOrder = -post.createdAt;
         }   else {
+            // if the there's no url,  photoOrder should not be existing from the data 
            summary.photoOrder = null ;
         }
 
