@@ -10,7 +10,7 @@
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
-    "deploy": "npm run lint:fix && firebase deploy --only functions:chatJoinWithPassword,functions:sendMessagesToChatRoomSubscribers,functions:sendMessagesToCommentSubscribers,functions:link,functions:sendPushNotifications,functions:postSummaries,functions:sendMessagesToCategorySubscribers,functions:userLike",
+    "deploy": "npm run lint:fix && firebase deploy --only functions:chatJoinWithPassword,functions:sendMessagesToChatRoomSubscribers,functions:sendMessagesToCommentSubscribers,functions:link,functions:sendPushNotifications,functions:postSummaries,functions:sendMessagesToCategorySubscribers,functions:userLike,functions:mirrorDatabaseToFirestore-0,functions:mirrorDatabaseToFirestore-1,functions:mirrorDatabaseToFirestore-2,functions:mirrorDatabaseToFirestore-3",
     "logs": "firebase functions:log",
     "test:user-count": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/user-count.spec.ts  --timeout 10000",
     "test:user-get": "mocha --require ts-node/register --watch --watch-files src/**/*.ts,tests/**/*.ts tests/user/user-get.spec.ts  --timeout 10000",

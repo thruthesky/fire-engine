@@ -9,12 +9,13 @@
  */
 
 import * as admin from "firebase-admin";
-import {setGlobalOptions} from "firebase-functions/v2";
+import { setGlobalOptions } from "firebase-functions/v2";
+import { Config } from "./config";
 
 admin.initializeApp();
 
 setGlobalOptions({
-    region: "asia-northeast3",
+    region: Config.region,
 });
 
 
@@ -25,5 +26,7 @@ export * from "./messaging/messaging.functions";
 export * from "./post/post.functions";
 export * from "./user/user.functions";
 export * from "./link/link.functions";
+export * from "./mirror/mirror.functions";
+
 
 
