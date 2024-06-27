@@ -52,6 +52,8 @@ export class PostService {
         if (post.order === undefined) throw new Error("order is required");
 
         const url = post.urls?.[0] ?? null;
+
+        // if the url exist we give photoOrder, with this we can display posts with urls only
         const summary = {
             uid: post.uid,
             createdAt: post.createdAt,
@@ -60,14 +62,8 @@ export class PostService {
             content: post.content ? strcut(post.content, 128) : null,
             url: url,
             deleted: post.deleted ?? null,
+            photoOrder: url ? -post.createdAt : null,
         } as PostSummary;
-
-        if (url) {
-            summary.photoOrder = -post.createdAt;
-        }   else {
-            // if the there's no url,  photoOrder should not be existing from the data 
-           summary.photoOrder = null ;
-        }
 
         if (post.group) {
             summary.group = post.group;

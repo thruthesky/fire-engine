@@ -35,7 +35,7 @@ export interface PostSummary {
     title?: string;
     content?: string;
     url?: string;
-    photoOrder?: number | null;
+    photoOrder?: number;
     createdAt: number;
     order: number;
     deleted?: boolean;
